@@ -24,6 +24,7 @@ export function DepositAddressPage() {
     openFundHistory,
     openHelpCenter,
     showToast,
+    figmaWalletOverlay,
   } = usePrototype()
 
   const coin = walletScreen?.coin ?? 'USDT'
@@ -32,7 +33,9 @@ export function DepositAddressPage() {
   const networkMeta = getDepositNetworkMeta(coin, chain)
   const networks = getDepositNetworksForCoin(coin)
   const [networkSheetOpen, setNetworkSheetOpen] = useState(false)
-  const [shareSheetOpen, setShareSheetOpen] = useState(false)
+  const [shareSheetOpen, setShareSheetOpen] = useState(
+    figmaWalletOverlay === 'deposit-share',
+  )
 
   function handleBack() {
     navigateWallet({ screen: 'deposit', coin, chain })

@@ -14,7 +14,7 @@
 | market/logged-in | https://coinlab088.github.io/coinlab/figma/market/logged-in |
 | trade | https://coinlab088.github.io/coinlab/figma/trade |
 | assets/guest | https://coinlab088.github.io/coinlab/figma/assets/guest |
-| assets/logged-in | https://coinlab088.github.io/coinlab/figma/assets/logged-in |
+| assets/logged-in | https://coinlab088.github.io/coinlab/figma/assets/logged-in | 已认证，无 KYC 标签 |
 
 ---
 
@@ -45,7 +45,9 @@
 | account/security-email | https://coinlab088.github.io/coinlab/figma/account/security-email |
 | account/security-login-password | https://coinlab088.github.io/coinlab/figma/account/security-login-password |
 | account/security-payment-password | https://coinlab088.github.io/coinlab/figma/account/security-payment-password |
-| account/kyc | https://coinlab088.github.io/coinlab/figma/account/kyc |
+| account/kyc | https://coinlab088.github.io/coinlab/figma/account/kyc | 未认证 |
+| account/kyc-pending | https://coinlab088.github.io/coinlab/figma/account/kyc-pending | 审核中 |
+| account/kyc-verified | https://coinlab088.github.io/coinlab/figma/account/kyc-verified | 已认证 |
 | account/kyc-sumsub | https://coinlab088.github.io/coinlab/figma/account/kyc-sumsub |
 | account/logout | https://coinlab088.github.io/coinlab/figma/account/logout |
 | account/delete | https://coinlab088.github.io/coinlab/figma/account/delete |
@@ -61,6 +63,7 @@
 | wallet/deposit | https://coinlab088.github.io/coinlab/figma/wallet/deposit |
 | wallet/deposit-fetching | https://coinlab088.github.io/coinlab/figma/wallet/deposit-fetching |
 | wallet/deposit-address | https://coinlab088.github.io/coinlab/figma/wallet/deposit-address |
+| wallet/deposit-address-share | https://coinlab088.github.io/coinlab/figma/wallet/deposit-address-share | 分享卡片 Sheet |
 | wallet/withdraw | https://coinlab088.github.io/coinlab/figma/wallet/withdraw |
 | wallet/withdraw-verify | https://coinlab088.github.io/coinlab/figma/wallet/withdraw-verify |
 | wallet/withdraw-success | https://coinlab088.github.io/coinlab/figma/wallet/withdraw-success |
@@ -115,7 +118,8 @@
 |----------|----------|------|
 | overlay/sheet-language | https://coinlab088.github.io/coinlab/figma/overlay/sheet-language | Bottom Sheet |
 | overlay/sheet-fiat | https://coinlab088.github.io/coinlab/figma/overlay/sheet-fiat | Bottom Sheet |
-| overlay/sheet-pair-picker | https://coinlab088.github.io/coinlab/figma/overlay/sheet-pair-picker | Bottom Sheet |
+| overlay/sheet-pair-picker | https://coinlab088.github.io/coinlab/figma/overlay/sheet-pair-picker | Bottom Sheet · 含搜索 |
+| overlay/sheet-order-book-depth | https://coinlab088.github.io/coinlab/figma/overlay/sheet-order-book-depth | Bottom Sheet |
 | overlay/sheet-order-confirm | https://coinlab088.github.io/coinlab/figma/overlay/sheet-order-confirm | Bottom Sheet |
 | overlay/sheet-add-favorite | https://coinlab088.github.io/coinlab/figma/overlay/sheet-add-favorite | Bottom Sheet |
 | overlay/alert-compliance | https://coinlab088.github.io/coinlab/figma/overlay/alert-compliance | Alert Dialog |

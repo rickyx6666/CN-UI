@@ -2,7 +2,7 @@ import type { AccountScreenState } from '../data/account'
 import type { AuthScreenState } from '../data/auth'
 import type { AppTheme } from '../data/appTheme'
 import type { ChartScreenState } from '../data/kline'
-import type { BottomTabId } from '../data/mock'
+import type { BottomTabId, KycStatus } from '../data/mock'
 import type { PreviewPlatform } from '../data/platform'
 import type { RecordsScreenState } from '../data/records'
 import type { SettingsSheet } from '../data/settings'
@@ -36,6 +36,12 @@ export interface PrototypePreset {
   orders?: SpotOrder[]
   withdrawDraft?: WithdrawDraft | null
   figmaToast?: FigmaToastPreset
+  /** Figma 导出：覆盖登录用户 KYC 状态 */
+  userKycStatus?: KycStatus
+  /** Figma 导出：钱包页叠加层 */
+  walletOverlay?: 'deposit-share'
+  /** Figma 导出：交易页叠加层 */
+  tradeOverlay?: 'order-book-depth'
   /** Figma 导出页：禁用自动跳转等原型行为 */
   figmaExport?: boolean
 }

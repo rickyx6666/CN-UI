@@ -120,6 +120,8 @@ interface PrototypeContextValue {
   closeKline: () => void
   figmaToast: FigmaToastPreset | null
   figmaExport: boolean
+  figmaWalletOverlay: 'deposit-share' | null
+  figmaTradeOverlay: 'order-book-depth' | null
   toast: AppToastState | null
   showToast: (message: string, variant?: ToastVariant) => void
   dismissToast: () => void
@@ -164,7 +166,10 @@ export function PrototypeProvider({
   preset?: PrototypePreset
 }) {
   const [isLoggedIn, setLoggedIn] = useState(preset?.isLoggedIn ?? false)
-  const [profile, setProfile] = useState(loggedInProfileDefaults)
+  const [profile, setProfile] = useState({
+    ...loggedInProfileDefaults,
+    ...(preset?.userKycStatus ? { kycStatus: preset.userKycStatus } : {}),
+  })
   const [activeTab, setActiveTab] = useState<BottomTabId>(preset?.activeTab ?? 'market')
   const [authScreen, setAuthScreen] = useState<AuthScreenState | null>(
     preset?.authScreen ?? null,
@@ -218,6 +223,8 @@ export function PrototypeProvider({
   )
   const figmaToast = preset?.figmaToast ?? null
   const figmaExport = preset?.figmaExport ?? false
+  const figmaWalletOverlay = preset?.walletOverlay ?? null
+  const figmaTradeOverlay = preset?.tradeOverlay ?? null
   const [toast, setToast] = useState<AppToastState | null>(null)
 
   const user = isLoggedIn
@@ -630,6 +637,8 @@ export function PrototypeProvider({
       closeKline,
       figmaToast,
       figmaExport,
+      figmaWalletOverlay,
+      figmaTradeOverlay,
       toast,
       showToast,
       dismissToast,
@@ -709,6 +718,8 @@ export function PrototypeProvider({
       setAppTheme,
       figmaToast,
       figmaExport,
+      figmaWalletOverlay,
+      figmaTradeOverlay,
       toast,
       showToast,
       dismissToast,

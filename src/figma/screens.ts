@@ -65,8 +65,9 @@ const tabScreens: FigmaScreenEntry[] = [
   {
     path: 'assets/logged-in',
     label: '资产 · 已登录',
+    description: '已认证用户不展示 KYC 标签',
     group: 'tab',
-    preset: app({ isLoggedIn: true, activeTab: 'assets' }),
+    preset: app({ isLoggedIn: true, activeTab: 'assets', userKycStatus: 'verified' }),
   },
 ]
 
@@ -241,12 +242,35 @@ const accountScreens: FigmaScreenEntry[] = [
   },
   {
     path: 'account/kyc',
-    label: '身份认证',
+    label: '身份认证 · 未认证',
     group: 'account',
     preset: app({
       isLoggedIn: true,
       activeTab: 'market',
       accountScreen: { screen: 'kyc' },
+      userKycStatus: 'unverified',
+    }),
+  },
+  {
+    path: 'account/kyc-pending',
+    label: '身份认证 · 审核中',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'kyc' },
+      userKycStatus: 'pending',
+    }),
+  },
+  {
+    path: 'account/kyc-verified',
+    label: '身份认证 · 已认证',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'kyc' },
+      userKycStatus: 'verified',
     }),
   },
   {
@@ -331,6 +355,18 @@ const walletScreens: FigmaScreenEntry[] = [
       isLoggedIn: true,
       activeTab: 'assets',
       walletScreen: { screen: 'deposit-address', coin: 'USDT', chain: 'TRC20' },
+    }),
+  },
+  {
+    path: 'wallet/deposit-address-share',
+    label: '充币地址 · 分享',
+    description: '保存/分享卡片 Bottom Sheet',
+    group: 'wallet',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'assets',
+      walletScreen: { screen: 'deposit-address', coin: 'USDT', chain: 'TRC20' },
+      walletOverlay: 'deposit-share',
     }),
   },
   {
@@ -495,12 +531,23 @@ const overlayScreens: FigmaScreenEntry[] = [
   {
     path: 'overlay/sheet-pair-picker',
     label: 'Bottom Sheet · 交易对',
-    description: '列表选择',
+    description: '列表选择 + 搜索',
     group: 'overlay',
     preset: app({
       isLoggedIn: true,
       activeTab: 'trade',
       tradeSheet: 'pair-picker',
+    }),
+  },
+  {
+    path: 'overlay/sheet-order-book-depth',
+    label: 'Bottom Sheet · 盘口精度',
+    description: '深度档位选择',
+    group: 'overlay',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'trade',
+      tradeOverlay: 'order-book-depth',
     }),
   },
   {

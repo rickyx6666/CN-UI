@@ -9,6 +9,7 @@ import {
 } from '../../data/trade'
 import type { MarketPair } from '../../data/mock'
 import { formatPrice } from '../../data/mock'
+import { usePrototype } from '../../context/PrototypeContext'
 import { BottomSheet, SheetOption } from '../sheets/BottomSheet'
 
 interface OrderBookProps {
@@ -36,8 +37,11 @@ function DepthBar({
 }
 
 export function OrderBook({ pair, asks, bids, onPriceSelect }: OrderBookProps) {
+  const { figmaTradeOverlay } = usePrototype()
   const [depth, setDepth] = useState<OrderBookDepth>('0.0001')
-  const [depthSheetOpen, setDepthSheetOpen] = useState(false)
+  const [depthSheetOpen, setDepthSheetOpen] = useState(
+    figmaTradeOverlay === 'order-book-depth',
+  )
 
   const maxAmount = Math.max(
     ...asks.map((l) => l.amount),

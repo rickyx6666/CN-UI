@@ -3,7 +3,6 @@ import { useState } from 'react'
 import type { PortfolioSummary, UserProfile } from '../data/mock'
 import { formatChangePercent, formatUsd, getKycLabel } from '../data/mock'
 import { usePrototype } from '../context/PrototypeContext'
-import { KycStatusBadge } from './account/KycStatusBanner'
 
 interface BalanceHeroProps {
   portfolio: PortfolioSummary
@@ -51,10 +50,6 @@ export function BalanceHero({ portfolio, user }: BalanceHeroProps) {
           '••••'
         )}
       </p>
-
-      {user.isLoggedIn && user.kycStatus === 'verified' && (
-        <KycStatusBadge status={user.kycStatus} className="mt-3" />
-      )}
 
       {user.isLoggedIn && user.kycStatus !== 'verified' && (
         <button
