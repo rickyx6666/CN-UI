@@ -4,6 +4,7 @@ import { useFigmaPcDocument } from '../hooks/useFigmaPcDocument'
 import { AppToast } from './feedback/AppToast'
 import { BottomTabBar } from './BottomTabBar'
 import { ContractOrderEditProvider, ContractOrderEditSheetHost } from './contract/ContractOrderEditContext'
+import { ContractPositionShareProvider } from './contract/ContractPositionShareContext'
 
 interface AppShellProps {
   children: ReactNode
@@ -34,22 +35,24 @@ export function AppShell({ children }: AppShellProps) {
 
   return (
     <ContractOrderEditProvider>
-      <div
-        className={`relative flex flex-col ${
-          pcDocument ? 'min-h-full' : 'h-full overflow-hidden'
-        }`}
-      >
+      <ContractPositionShareProvider>
         <div
-          className={`relative ${
-            pcDocument ? '' : 'min-h-0 flex-1 overflow-hidden'
+          className={`relative flex flex-col ${
+            pcDocument ? 'min-h-full' : 'h-full overflow-hidden'
           }`}
         >
-          {children}
-          <ContractOrderEditSheetHost />
+          <div
+            className={`relative ${
+              pcDocument ? '' : 'min-h-0 flex-1 overflow-hidden'
+            }`}
+          >
+            {children}
+            <ContractOrderEditSheetHost />
+          </div>
+          {showTabBar && <BottomTabBar />}
+          <AppToast />
         </div>
-        {showTabBar && <BottomTabBar />}
-        <AppToast />
-      </div>
+      </ContractPositionShareProvider>
     </ContractOrderEditProvider>
   )
 }

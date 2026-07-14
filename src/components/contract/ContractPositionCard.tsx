@@ -1,7 +1,9 @@
 import { Pencil, Share2 } from 'lucide-react'
 import type { ContractPosition } from '../../data/contract'
 import { contractMarginModeLabel, contractMarginRatioClass } from '../../data/contract'
+import { contractShareFromOpen } from '../../data/contractShare'
 import { formatUsd } from '../../data/mock'
+import { useContractPositionShare } from './ContractPositionShareContext'
 
 interface ContractPositionCardProps {
   position: ContractPosition
@@ -12,6 +14,7 @@ export function ContractPositionCard({
   position,
   readOnly = false,
 }: ContractPositionCardProps) {
+  const { openContractPositionShare } = useContractPositionShare()
   const isLong = position.side === 'long'
   const positive = position.pnlUsd >= 0
 
@@ -33,15 +36,14 @@ export function ContractPositionCard({
             </span>
           </p>
         </div>
-        {!readOnly && (
-          <button
-            type="button"
-            aria-label="分享"
-            className="flex h-7 w-7 shrink-0 items-center justify-center text-secondary active:opacity-70"
-          >
-            <Share2 className="h-3.5 w-3.5" strokeWidth={1.5} />
-          </button>
-        )}
+        <button
+          type="button"
+          aria-label="分享"
+          onClick={() => openContractPositionShare(contractShareFromOpen(position))}
+          className="flex h-7 w-7 shrink-0 items-center justify-center text-secondary active:opacity-70"
+        >
+          <Share2 className="h-3.5 w-3.5" strokeWidth={1.5} />
+        </button>
       </div>
 
       <div className="mb-3 grid grid-cols-3 gap-x-2">

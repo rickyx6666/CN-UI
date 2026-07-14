@@ -1,11 +1,13 @@
 import { Share2 } from 'lucide-react'
 import { contractMarginModeLabel } from '../../data/contract'
+import { contractShareFromClosed } from '../../data/contractShare'
 import {
   contractPositionHistoryStatusLabel,
   formatContractRecordTime,
   type ContractPositionHistory,
 } from '../../data/contractRecords'
 import { formatUsd } from '../../data/mock'
+import { useContractPositionShare } from './ContractPositionShareContext'
 
 interface ContractPositionHistoryCardProps {
   position: ContractPositionHistory
@@ -14,6 +16,7 @@ interface ContractPositionHistoryCardProps {
 export function ContractPositionHistoryCard({
   position,
 }: ContractPositionHistoryCardProps) {
+  const { openContractPositionShare } = useContractPositionShare()
   const isLong = position.side === 'long'
   const positivePnl = position.realizedPnl >= 0
   const positiveRoe = position.roePercent >= 0
@@ -27,7 +30,7 @@ export function ContractPositionHistoryCard({
               isLong ? 'bg-success' : 'bg-danger'
             }`}
           >
-            {isLong ? '买' : '卖'}
+            {isLong ? '多' : '空'}
           </span>
           <p className="truncate text-body-sm font-medium text-primary">
             {position.symbol}USDT 永续{' '}
@@ -43,6 +46,9 @@ export function ContractPositionHistoryCard({
           <button
             type="button"
             aria-label="分享"
+            onClick={() =>
+              openContractPositionShare(contractShareFromClosed(position))
+            }
             className="flex h-6 w-6 items-center justify-center text-secondary active:opacity-70"
           >
             <Share2 className="h-3.5 w-3.5" strokeWidth={1.5} />
