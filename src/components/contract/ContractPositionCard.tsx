@@ -88,9 +88,12 @@ export function ContractPositionCard({
         }`}
       >
         <span className="text-secondary">仓位止盈止损</span>
-        <div className="flex items-center gap-1 tabular-nums text-primary">
-          <span>
-            {formatUsd(position.takeProfitPrice)} /{' '}
+        <div className="flex items-center gap-1 tabular-nums">
+          <span className="text-success">
+            {formatUsd(position.takeProfitPrice)}
+          </span>
+          <span className="text-secondary">/</span>
+          <span className="text-danger">
             {formatUsd(position.stopLossPrice)}
           </span>
           {!readOnly && (

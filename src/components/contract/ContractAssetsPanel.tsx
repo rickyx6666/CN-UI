@@ -5,7 +5,12 @@ import { usePrototype } from '../../context/PrototypeContext'
 import { ContractPositionCard } from './ContractPositionCard'
 
 export function ContractAssetsPanel() {
-  const { openContractHistory } = usePrototype()
+  const {
+    openContractHistory,
+    openWallet,
+    setActiveTab,
+    setProductModule,
+  } = usePrototype()
   const { equityUsd, availableMarginUsd, unrealizedPnlUsd, marginRatioPercent } =
     contractPortfolioSummary
   const isPositive = unrealizedPnlUsd >= 0
@@ -27,6 +32,26 @@ export function ContractAssetsPanel() {
           label="保证金率"
           value={`${marginRatioPercent}%`}
         />
+      </div>
+
+      <div className="mb-4 flex gap-2">
+        <button
+          type="button"
+          onClick={() => {
+            setProductModule('contract')
+            setActiveTab('trade')
+          }}
+          className="h-11 min-w-0 flex-1 rounded-md bg-brand text-body-sm font-semibold text-brand-dark active:bg-brand-hover"
+        >
+          交易
+        </button>
+        <button
+          type="button"
+          onClick={() => openWallet('transfer')}
+          className="h-11 min-w-0 flex-1 rounded-md border border-border text-body-sm font-medium text-primary active:bg-elevated"
+        >
+          划转
+        </button>
       </div>
 
       <div className="mb-3 flex items-center justify-between">
