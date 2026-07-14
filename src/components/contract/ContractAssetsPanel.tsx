@@ -1,5 +1,6 @@
 import { FileClock } from 'lucide-react'
 import { contractPortfolioSummary, contractPositions } from '../../data/contract'
+import { approximateCny } from '../../data/assets'
 import { formatUsd } from '../../data/mock'
 import { usePrototype } from '../../context/PrototypeContext'
 import { ContractPositionCard } from './ContractPositionCard'
@@ -18,15 +19,22 @@ export function ContractAssetsPanel() {
   return (
     <section className="pb-4">
       <div className="mb-4 grid grid-cols-2 gap-2">
-        <MetricCard label="账户权益 (USD)" value={`$${formatUsd(equityUsd)}`} />
+        <MetricCard
+          label="账户权益 (USD)"
+          value={`$${formatUsd(equityUsd)}`}
+          approxUsd={equityUsd}
+        />
         <MetricCard
           label="可用保证金"
           value={`$${formatUsd(availableMarginUsd)}`}
+          approxUsd={availableMarginUsd}
         />
         <MetricCard
           label="未实现盈亏"
           value={`${isPositive ? '+' : '−'}$${formatUsd(Math.abs(unrealizedPnlUsd))}`}
           valueClassName={isPositive ? 'text-success' : 'text-danger'}
+          approxUsd={unrealizedPnlUsd}
+          approxClassName={isPositive ? 'text-success' : 'text-danger'}
         />
         <MetricCard
           label="保证金率"
@@ -87,10 +95,14 @@ function MetricCard({
   label,
   value,
   valueClassName = 'text-primary',
+  approxUsd,
+  approxClassName = 'text-secondary',
 }: {
   label: string
   value: string
   valueClassName?: string
+  approxUsd?: number
+  approxClassName?: string
 }) {
   return (
     <div className="rounded-lg border border-border-subtle bg-elevated px-3 py-3">
@@ -98,6 +110,11 @@ function MetricCard({
       <p className={`mt-1 tabular-nums text-body-sm font-medium ${valueClassName}`}>
         {value}
       </p>
+      {approxUsd != null && (
+        <p className={`mt-0.5 tabular-nums text-[10px] ${approxClassName}`}>
+          {approximateCny(approxUsd)}
+        </p>
+      )}
     </div>
   )
 }

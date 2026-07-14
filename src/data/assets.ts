@@ -45,7 +45,8 @@ export const assetAccountLabels: Record<AssetAccountId, string> = {
 
 /** 原型：USD → CNY 估算 */
 export function approximateCny(usd: number): string {
-  return `≈ ¥${formatUsd(usd * 6.78)}`
+  const sign = usd < 0 ? '−' : ''
+  return `≈ ${sign}¥${formatUsd(Math.abs(usd) * 6.78)}`
 }
 
 export function fundingCoinBalances() {
