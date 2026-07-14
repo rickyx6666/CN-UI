@@ -168,7 +168,7 @@ export function OrderForm({
   }
 
   return (
-    <div className="min-w-0 flex-[1.15]">
+    <div className="min-w-0 w-full">
       <div className="mb-2 grid grid-cols-2 overflow-hidden rounded-md">
         <button
           type="button"

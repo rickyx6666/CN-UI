@@ -115,8 +115,8 @@ const tabScreens: MobileScreenDef[] = [
   },
   {
     path: 'assets/logged-in-contract',
-    label: '资产 · 已登录 · 合约',
-    description: '合约权益、保证金与持仓',
+    label: '资产 · 已登录 · 合约账户',
+    description: '总览账户列表，可进入合约账户查看权益与持仓',
     group: 'tab',
     preset: app({
       isLoggedIn: true,

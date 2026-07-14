@@ -1,20 +1,19 @@
-import { useEffect, useRef } from 'react'
-import { ChevronRight } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { usePrototype } from '../context/PrototypeContext'
-import { coinBalances, portfolioSummary } from '../data/mock'
-import { formatBalance, formatUsd } from '../data/mock'
-import type { WalletCoin } from '../data/wallet'
+import { portfolioSummary } from '../data/mock'
+import { formatUsd } from '../data/mock'
+import {
+  approximateCny,
+  assetAccountLabels,
+  assetAccountSummaries,
+  type AssetAccountId,
+} from '../data/assets'
 import { AppLayout } from '../components/AppLayout'
 import { BalanceHero } from '../components/BalanceHero'
-import { CoinAvatar } from '../components/CoinAvatar'
-import { ProductModuleTabs } from '../components/ProductModuleTabs'
+import { FundingAssetsPanel } from '../components/assets/FundingAssetsPanel'
+import { SpotAssetsPanel } from '../components/assets/SpotAssetsPanel'
 import { ContractAssetsPanel } from '../components/contract/ContractAssetsPanel'
-
-const coinToWallet: Record<string, WalletCoin> = {
-  USDT: 'USDT',
-  BNB: 'BNB',
-  TRX: 'TRX',
-}
 
 export function AssetsPage() {
   const {
@@ -24,11 +23,11 @@ export function AssetsPage() {
     openFundHistory,
     openOrderHistory,
     navigateAccount,
-    productModule,
-    setProductModule,
-  } =
-    usePrototype()
+  } = usePrototype()
   const autoOpened = useRef(false)
+  const [activeAccount, setActiveAccount] = useState<AssetAccountId | null>(
+    null,
+  )
 
   useEffect(() => {
     if (!user.isLoggedIn && !autoOpened.current) {
@@ -39,6 +38,22 @@ export function AssetsPage() {
 
   if (!user.isLoggedIn) {
     return null
+  }
+
+  if (activeAccount) {
+    return (
+      <AppLayout>
+        <AccountDetailHeader
+          title={assetAccountLabels[activeAccount]}
+          onBack={() => setActiveAccount(null)}
+        />
+        <section className="layout-screen-x pb-4">
+          {activeAccount === 'funding' && <FundingAssetsPanel />}
+          {activeAccount === 'spot' && <SpotAssetsPanel />}
+          {activeAccount === 'contract' && <ContractAssetsPanel />}
+        </section>
+      </AppLayout>
+    )
   }
 
   return (
@@ -81,72 +96,57 @@ export function AssetsPage() {
       </div>
 
       <section className="layout-screen-x mt-5 pb-4">
-        <div className="mb-3">
-          <ProductModuleTabs
-            active={productModule}
-            onChange={setProductModule}
-          />
-        </div>
-
-        {productModule === 'contract' ? (
-          <ContractAssetsPanel />
-        ) : (
-          <>
-            <h2 className="mb-3 text-body-sm font-medium text-secondary">我的资产</h2>
-            <ul className="divide-y divide-border-subtle">
-              {coinBalances.map((coin) => {
-                const walletCoin = coinToWallet[coin.symbol]
-
-                return (
-                  <li
-                    key={coin.id}
-                    className="flex items-center justify-between py-3"
-                  >
-                    <div className="flex items-center gap-3">
-                      <CoinAvatar symbol={coin.symbol} size={32} />
-                      <div>
-                        <p className="text-body font-medium text-primary">
-                          {coin.symbol}
-                        </p>
-                        <p className="text-caption text-secondary">{coin.chain}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="tabular-nums text-body text-primary">
-                        {formatBalance(coin.balance, coin.symbol)}
-                      </p>
-                      <p className="tabular-nums text-caption text-secondary">
-                        ${formatUsd(coin.usdValue)}
-                      </p>
-                      {walletCoin && (
-                        <div className="mt-1.5 flex justify-end gap-2">
-                          <button
-                            type="button"
-                            onClick={() => openWallet('deposit', { coin: walletCoin })}
-                            className="text-[10px] text-brand"
-                          >
-                            充币
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              openWallet('withdraw', { coin: walletCoin })
-                            }
-                            className="text-[10px] text-secondary"
-                          >
-                            提币
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          </>
-        )}
+        <h2 className="mb-3 text-body-sm font-medium text-secondary">账户</h2>
+        <ul className="divide-y divide-border-subtle overflow-hidden rounded-lg border border-border-subtle bg-elevated">
+          {assetAccountSummaries.map((account) => (
+            <li key={account.id}>
+              <button
+                type="button"
+                onClick={() => setActiveAccount(account.id)}
+                className="flex w-full items-center justify-between px-4 py-3.5 text-left active:bg-sunken"
+              >
+                <span className="text-body-sm font-medium text-primary">
+                  {account.label}
+                </span>
+                <div className="flex items-center gap-2">
+                  <div className="text-right">
+                    <p className="tabular-nums text-body-sm text-primary">
+                      {formatUsd(account.balanceUsd)} USDT
+                    </p>
+                    <p className="tabular-nums text-caption text-secondary">
+                      {approximateCny(account.balanceUsd)}
+                    </p>
+                  </div>
+                  <ChevronRight className="h-4 w-4 shrink-0 text-secondary" />
+                </div>
+              </button>
+            </li>
+          ))}
+        </ul>
       </section>
     </AppLayout>
+  )
+}
+
+function AccountDetailHeader({
+  title,
+  onBack,
+}: {
+  title: string
+  onBack: () => void
+}) {
+  return (
+    <header className="layout-screen-x flex items-center gap-1 pb-4 pt-3">
+      <button
+        type="button"
+        aria-label="返回"
+        onClick={onBack}
+        className="flex h-10 w-10 items-center justify-center text-primary active:opacity-70"
+      >
+        <ChevronLeft className="h-6 w-6" strokeWidth={1.5} />
+      </button>
+      <h1 className="text-h3 font-medium text-primary">{title}</h1>
+    </header>
   )
 }
 

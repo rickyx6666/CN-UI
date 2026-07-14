@@ -134,6 +134,7 @@ interface PrototypeContextValue {
   fundRecords: FundRecord[]
   openFundHistory: () => void
   openOrderHistory: () => void
+  openContractHistory: () => void
   closeRecords: () => void
   navigateRecords: (screen: RecordsScreenState) => void
   addFundRecord: (record: FundRecord) => void
@@ -653,6 +654,10 @@ export function PrototypeProvider({
     setRecordsScreen({ screen: 'orders' })
   }, [])
 
+  const openContractHistory = useCallback(() => {
+    setRecordsScreen({ screen: 'contract-records' })
+  }, [])
+
   const closeRecords = useCallback(() => {
     setRecordsScreen(null)
   }, [])
@@ -782,6 +787,7 @@ export function PrototypeProvider({
       fundRecords,
       openFundHistory,
       openOrderHistory,
+      openContractHistory,
       closeRecords,
       navigateRecords,
       addFundRecord,
@@ -873,6 +879,7 @@ export function PrototypeProvider({
       fundRecords,
       openFundHistory,
       openOrderHistory,
+      openContractHistory,
       closeRecords,
       navigateRecords,
       addFundRecord,

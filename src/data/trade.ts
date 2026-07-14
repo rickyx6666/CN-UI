@@ -58,7 +58,13 @@ export const defaultSpotBalances: SpotBalance[] = [
   { symbol: 'SOL', available: 8.6, frozen: 0 },
 ]
 
-export function generateOrderBook(midPrice: number): {
+export const spotOrderBookLevels = 5
+export const contractOrderBookLevels = 7
+
+export function generateOrderBook(
+  midPrice: number,
+  levels = 5,
+): {
   asks: OrderBookLevel[]
   bids: OrderBookLevel[]
 } {
@@ -66,7 +72,7 @@ export function generateOrderBook(midPrice: number): {
   const bids: OrderBookLevel[] = []
   const step = midPrice >= 100 ? midPrice * 0.00015 : midPrice * 0.0008
 
-  for (let i = 5; i >= 1; i -= 1) {
+  for (let i = levels; i >= 1; i -= 1) {
     asks.push({
       price: midPrice + step * i,
       amount: 0.08 + i * 0.04,

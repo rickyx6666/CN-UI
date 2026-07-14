@@ -18,6 +18,7 @@ interface OrderBookProps {
   bids: OrderBookLevel[]
   onPriceSelect?: (price: number) => void
   showDepthRatio?: boolean
+  compact?: boolean
 }
 
 function DepthBar({
@@ -43,6 +44,7 @@ export function OrderBook({
   bids,
   onPriceSelect,
   showDepthRatio = false,
+  compact = false,
 }: OrderBookProps) {
   const { figmaTradeOverlay } = usePrototype()
   const [depth, setDepth] = useState<OrderBookDepth>(
@@ -56,19 +58,19 @@ export function OrderBook({
     ...asks.map((l) => l.amount),
     ...bids.map((l) => l.amount),
   )
+  const isPositive = pair.change24h >= 0
   const bidTotal = bids.reduce((sum, level) => sum + level.amount, 0)
   const askTotal = asks.reduce((sum, level) => sum + level.amount, 0)
   const depthTotal = bidTotal + askTotal
   const bidRatio = depthTotal > 0 ? (bidTotal / depthTotal) * 100 : 50
   const askRatio = 100 - bidRatio
-  const isPositive = pair.change24h >= 0
 
   function formatLevelPrice(price: number) {
     return formatOrderBookPrice(price, depth)
   }
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col">
+    <div className={`flex min-w-0 w-full flex-col ${compact ? '' : 'flex-1'}`}>
       <div className="mb-1 flex justify-between text-[9px] text-secondary">
         <span>价格({pair.quote})</span>
         <span>数量({pair.base})</span>
@@ -83,26 +85,30 @@ export function OrderBook({
             className="relative flex w-full items-center justify-between py-px text-left active:opacity-80"
           >
             <DepthBar width={(level.amount / maxAmount) * 100} tone="ask" />
-            <span className="relative z-10 tabular-nums text-[10px] text-danger">
+            <span className="relative z-10 min-w-0 truncate tabular-nums text-[10px] text-danger">
               {formatLevelPrice(level.price)}
             </span>
-            <span className="relative z-10 tabular-nums text-[10px] text-secondary">
+            <span className="relative z-10 min-w-0 truncate tabular-nums text-[10px] text-secondary">
               {formatTradeAmount(level.amount, pair.base)}
             </span>
           </button>
         ))}
       </div>
 
-      <div className="py-1 text-center">
+      <div className={compact ? 'py-0.5 text-center' : 'py-1 text-center'}>
         <p
           className={`tabular-nums text-body-sm font-semibold ${
-            isPositive ? 'text-success' : 'text-danger'
+            showDepthRatio || isPositive ? 'text-success' : 'text-danger'
           }`}
         >
-          {formatPrice(pair.price)}
+          {showDepthRatio
+            ? formatOrderBookPrice(pair.price, '0.1')
+            : formatPrice(pair.price)}
         </p>
         <p className="tabular-nums text-[9px] text-secondary">
-          ≈¥{(pair.price * 6.9).toFixed(2)}
+          {showDepthRatio
+            ? formatOrderBookPrice(pair.price - pair.price * 0.000002, '0.1')
+            : `≈¥${(pair.price * 6.9).toFixed(2)}`}
         </p>
       </div>
 
@@ -115,10 +121,10 @@ export function OrderBook({
             className="relative flex w-full items-center justify-between py-px text-left active:opacity-80"
           >
             <DepthBar width={(level.amount / maxAmount) * 100} tone="bid" />
-            <span className="relative z-10 tabular-nums text-[10px] text-success">
+            <span className="relative z-10 min-w-0 truncate tabular-nums text-[10px] text-success">
               {formatLevelPrice(level.price)}
             </span>
-            <span className="relative z-10 tabular-nums text-[10px] text-secondary">
+            <span className="relative z-10 min-w-0 truncate tabular-nums text-[10px] text-secondary">
               {formatTradeAmount(level.amount, pair.base)}
             </span>
           </button>

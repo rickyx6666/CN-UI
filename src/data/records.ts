@@ -9,6 +9,7 @@ export type RecordsScreenName =
   | 'deposit-detail'
   | 'orders'
   | 'order-detail'
+  | 'contract-records'
 
 export interface RecordsScreenState {
   screen: RecordsScreenName
@@ -42,6 +43,8 @@ export const recordsCopy = {
   depositDetailTitle: '充币详情',
   ordersTitle: '现货订单',
   orderDetailTitle: '委托详情',
+  contractRecordsTitle: '交易',
+  contractRecordsSubtitle: 'U本位合约',
 } as const
 
 export const mockFundRecords: FundRecord[] = [
