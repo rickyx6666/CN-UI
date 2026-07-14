@@ -4,10 +4,17 @@ import { fundingBalances, walletAssets, type WalletCoin } from './wallet'
 
 export type AssetAccountId = 'funding' | 'spot' | 'contract'
 
+export type AssetPageTabId = 'overview' | AssetAccountId
+
 export interface AssetAccountSummary {
   id: AssetAccountId
   label: string
   balanceUsd: number
+}
+
+export interface AssetPageTab {
+  id: AssetPageTabId
+  label: string
 }
 
 const walletUsdRate: Record<WalletCoin, number> = {
@@ -47,6 +54,13 @@ export const assetAccountPnl: Record<
   contract: { usd: -15.2, percent: -0.08 },
 }
 
+export const assetPageTabs: AssetPageTab[] = [
+  { id: 'overview', label: '总览' },
+  { id: 'funding', label: '资金' },
+  { id: 'spot', label: '现货' },
+  { id: 'contract', label: '合约' },
+]
+
 export const assetAccountSummaries: AssetAccountSummary[] = [
   { id: 'funding', label: '资金', balanceUsd: fundingBalanceUsd() },
   { id: 'spot', label: '现货', balanceUsd: spotBalanceUsd() },
@@ -69,6 +83,26 @@ export function approximateCny(usd: number): string {
   return `≈ ${sign}¥${formatUsd(Math.abs(usd) * 6.78)}`
 }
 
+/** 资金账户列表：币种下方展示链网络 */
+export const fundingCoinChainLabels: Record<WalletCoin, string> = {
+  USDT: 'BSC / TRC20',
+  BNB: 'BSC',
+  TRX: 'TRC20',
+}
+
+/** 现货账户列表：币种下方展示全称 */
+export const coinFullNames: Record<string, string> = {
+  USDT: 'Tether',
+  BNB: 'BNB',
+  TRX: 'TRON',
+  BTC: 'Bitcoin',
+  ETH: 'Ethereum',
+}
+
+export function getCoinFullName(symbol: string): string {
+  return coinFullNames[symbol] ?? symbol
+}
+
 export function fundingCoinBalances() {
   return walletAssets.map((asset) => {
     const balance = fundingBalances[asset.symbol]
@@ -76,6 +110,7 @@ export function fundingCoinBalances() {
     return {
       id: asset.id,
       symbol: asset.symbol,
+      chainLabel: fundingCoinChainLabels[asset.symbol],
       balance,
       usdValue,
     }

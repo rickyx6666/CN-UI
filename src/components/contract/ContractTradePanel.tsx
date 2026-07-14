@@ -22,6 +22,8 @@ interface ContractTradePanelProps {
 const percentMarks = [0, 25, 50, 75, 100] as const
 const timeInForceOptions = ['GTC', 'IOC', 'FOK'] as const
 const callbackRatePresets = ['1', '2'] as const
+const tpSlTriggerOptions = ['最新', '标记'] as const
+const tpSlUnitOptions = ['USDT', '收益率'] as const
 
 const openOrderKindIds = new Set<ContractOrderKind>(
   contractOrderKinds.map((item) => item.id),
@@ -45,6 +47,17 @@ export function ContractTradePanel({
   const [activationPrice, setActivationPrice] = useState(String(pair.price))
   const [useLatestActivation, setUseLatestActivation] = useState(true)
   const [tpSlEnabled, setTpSlEnabled] = useState(false)
+  const [tpSlAdvanced, setTpSlAdvanced] = useState(false)
+  const [takeProfitValue, setTakeProfitValue] = useState('')
+  const [stopLossValue, setStopLossValue] = useState('')
+  const [tpTrigger, setTpTrigger] =
+    useState<(typeof tpSlTriggerOptions)[number]>('最新')
+  const [slTrigger, setSlTrigger] =
+    useState<(typeof tpSlTriggerOptions)[number]>('最新')
+  const [tpUnit, setTpUnit] =
+    useState<(typeof tpSlUnitOptions)[number]>('USDT')
+  const [slUnit, setSlUnit] =
+    useState<(typeof tpSlUnitOptions)[number]>('USDT')
   const [timeInForce, setTimeInForce] =
     useState<(typeof timeInForceOptions)[number]>('GTC')
 
@@ -296,30 +309,78 @@ export function ContractTradePanel({
       </div>
 
       {!isClose ? (
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <label className="flex items-center gap-2 text-[10px] text-secondary">
-            <input
-              type="checkbox"
-              checked={tpSlEnabled}
-              onChange={(e) => setTpSlEnabled(e.target.checked)}
-              className="h-3.5 w-3.5 rounded border-border accent-brand"
-            />
-            止盈/止损
-          </label>
-          <button
-            type="button"
-            onClick={() => {
-              const index = timeInForceOptions.indexOf(timeInForce)
-              const next =
-                timeInForceOptions[(index + 1) % timeInForceOptions.length]
-              setTimeInForce(next)
-            }}
-            className="flex items-center gap-1 text-[10px] text-secondary"
-          >
-            {timeInForce}
-            <ChevronDown className="h-3 w-3" strokeWidth={1.5} />
-          </button>
-        </div>
+        <>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <label className="flex items-center gap-2 text-[10px] text-secondary">
+              <input
+                type="checkbox"
+                checked={tpSlEnabled}
+                onChange={(e) => {
+                  const checked = e.target.checked
+                  setTpSlEnabled(checked)
+                  if (!checked) {
+                    setTpSlAdvanced(false)
+                    setTakeProfitValue('')
+                    setStopLossValue('')
+                  }
+                }}
+                className="h-3.5 w-3.5 rounded border-border accent-brand"
+              />
+              止盈/止损
+            </label>
+            <button
+              type="button"
+              onClick={() => {
+                if (tpSlEnabled) {
+                  if (tpSlAdvanced) {
+                    setTpSlAdvanced(false)
+                    return
+                  }
+                  const index = timeInForceOptions.indexOf(timeInForce)
+                  if (index === timeInForceOptions.length - 1) {
+                    setTpSlAdvanced(true)
+                    return
+                  }
+                  setTimeInForce(timeInForceOptions[index + 1])
+                  return
+                }
+                const index = timeInForceOptions.indexOf(timeInForce)
+                const next =
+                  timeInForceOptions[(index + 1) % timeInForceOptions.length]
+                setTimeInForce(next)
+              }}
+              className="flex items-center gap-1 text-[10px] text-secondary"
+            >
+              {tpSlEnabled && tpSlAdvanced ? '高级' : timeInForce}
+              <ChevronDown className="h-3 w-3" strokeWidth={1.5} />
+            </button>
+          </div>
+
+          {tpSlEnabled ? (
+            <div className="mb-2 space-y-1.5">
+              <TpSlSettingField
+                label="止盈"
+                placeholder={tpSlAdvanced ? '盈亏' : '价格'}
+                value={takeProfitValue}
+                onChange={setTakeProfitValue}
+                trigger={tpTrigger}
+                onTriggerChange={setTpTrigger}
+                unit={tpUnit}
+                onUnitChange={setTpUnit}
+              />
+              <TpSlSettingField
+                label="止损"
+                placeholder="价格"
+                value={stopLossValue}
+                onChange={setStopLossValue}
+                trigger={slTrigger}
+                onTriggerChange={setSlTrigger}
+                unit={slUnit}
+                onUnitChange={setSlUnit}
+              />
+            </div>
+          ) : null}
+        </>
       ) : null}
 
       <div className="space-y-1.5">
@@ -461,6 +522,72 @@ function CallbackRateField({
         </div>
       </div>
     </label>
+  )
+}
+
+function TpSlSettingField({
+  label,
+  placeholder,
+  value,
+  onChange,
+  trigger,
+  onTriggerChange,
+  unit,
+  onUnitChange,
+}: {
+  label: string
+  placeholder: string
+  value: string
+  onChange: (value: string) => void
+  trigger: (typeof tpSlTriggerOptions)[number]
+  onTriggerChange: (value: (typeof tpSlTriggerOptions)[number]) => void
+  unit: (typeof tpSlUnitOptions)[number]
+  onUnitChange: (value: (typeof tpSlUnitOptions)[number]) => void
+}) {
+  function cycleTrigger() {
+    const index = tpSlTriggerOptions.indexOf(trigger)
+    onTriggerChange(
+      tpSlTriggerOptions[(index + 1) % tpSlTriggerOptions.length],
+    )
+  }
+
+  function cycleUnit() {
+    const index = tpSlUnitOptions.indexOf(unit)
+    onUnitChange(tpSlUnitOptions[(index + 1) % tpSlUnitOptions.length])
+  }
+
+  return (
+    <div>
+      <div className="mb-1 flex items-center justify-between text-[10px]">
+        <span className="text-secondary">{label}</span>
+        <button
+          type="button"
+          onClick={cycleTrigger}
+          className="flex items-center gap-0.5 text-secondary active:opacity-70"
+        >
+          {trigger}
+          <ChevronDown className="h-3 w-3" strokeWidth={1.5} />
+        </button>
+      </div>
+      <div className="grid h-9 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 rounded-md bg-sunken px-2.5">
+        <input
+          type="text"
+          inputMode="decimal"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className="min-w-0 bg-transparent text-left text-caption tabular-nums text-primary outline-none placeholder:text-primary-muted"
+        />
+        <button
+          type="button"
+          onClick={cycleUnit}
+          className="flex min-w-[52px] items-center justify-end gap-0.5 text-[10px] text-secondary active:opacity-70"
+        >
+          {unit}
+          <ChevronDown className="h-3 w-3" strokeWidth={1.5} />
+        </button>
+      </div>
+    </div>
   )
 }
 
