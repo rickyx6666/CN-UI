@@ -52,7 +52,7 @@ export function DepositAddressPage() {
 
   async function handleSaveImage() {
     setShareSheetOpen(false)
-    showToast('已保存到相册')
+    navigateWallet({ screen: 'deposit-save-success', coin, chain })
   }
 
   async function handleShare() {

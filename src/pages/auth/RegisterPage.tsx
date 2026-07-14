@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { AuthButton } from '../../components/auth/AuthButton'
 import { AuthPageShell } from '../../components/auth/AuthPageShell'
 import { TextField } from '../../components/auth/TextField'
-import { authCopy, isValidEmail } from '../../data/auth'
+import { authCopy, isValidAccount } from '../../data/auth'
 import { usePrototype } from '../../context/PrototypeContext'
 
 export function RegisterPage() {
@@ -20,8 +20,8 @@ export function RegisterPage() {
     e.preventDefault()
     let valid = true
 
-    if (!isValidEmail(email)) {
-      setEmailError('请输入有效邮箱地址')
+    if (!isValidAccount(email)) {
+      setEmailError(authCopy.accountInvalid)
       valid = false
     } else {
       setEmailError(undefined)
@@ -50,18 +50,18 @@ export function RegisterPage() {
   return (
     <AuthPageShell title={authCopy.registerTitle} onBack={closeAuth}>
       <p className="mb-6 text-body-sm text-secondary">
-        使用邮箱注册 CoinNova 账户
+        {authCopy.registerHint}
       </p>
 
       <form onSubmit={handleSubmit}>
         <TextField
-          label="邮箱"
-          type="email"
+          label={authCopy.accountLabel}
+          type="text"
           value={email}
           onChange={setEmail}
-          placeholder="name@example.com"
+          placeholder={authCopy.accountPlaceholder}
           error={emailError}
-          autoComplete="email"
+          autoComplete="username"
         />
         <button
           type="button"

@@ -56,7 +56,11 @@ export function FundHistoryPage() {
               <button
                 type="button"
                 onClick={() =>
-                  navigateRecords({ screen: 'fund-detail', fundId: record.id })
+                  navigateRecords({
+                    screen:
+                      record.type === 'deposit' ? 'deposit-detail' : 'fund-detail',
+                    fundId: record.id,
+                  })
                 }
                 className="flex w-full items-center gap-3 px-4 py-3.5 text-left active:bg-sunken"
               >

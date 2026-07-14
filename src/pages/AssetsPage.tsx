@@ -7,6 +7,8 @@ import type { WalletCoin } from '../data/wallet'
 import { AppLayout } from '../components/AppLayout'
 import { BalanceHero } from '../components/BalanceHero'
 import { CoinAvatar } from '../components/CoinAvatar'
+import { ProductModuleTabs } from '../components/ProductModuleTabs'
+import { ContractAssetsPanel } from '../components/contract/ContractAssetsPanel'
 
 const coinToWallet: Record<string, WalletCoin> = {
   USDT: 'USDT',
@@ -22,6 +24,8 @@ export function AssetsPage() {
     openFundHistory,
     openOrderHistory,
     navigateAccount,
+    productModule,
+    setProductModule,
   } =
     usePrototype()
   const autoOpened = useRef(false)
@@ -42,20 +46,27 @@ export function AssetsPage() {
       <BalanceHero portfolio={portfolioSummary} user={user} />
 
       <div className="layout-screen-x space-y-4">
-        <div className="flex gap-3">
+        <div className="flex gap-2">
           <button
             type="button"
             onClick={() => openWallet('deposit')}
-            className="h-11 flex-1 rounded-md bg-brand text-body-sm font-semibold text-brand-dark active:bg-brand-hover"
+            className="h-11 min-w-0 flex-1 rounded-md bg-brand text-body-sm font-semibold text-brand-dark active:bg-brand-hover"
           >
             充币
           </button>
           <button
             type="button"
             onClick={() => openWallet('withdraw')}
-            className="h-11 flex-1 rounded-md border border-border text-body-sm font-medium text-primary active:bg-elevated"
+            className="h-11 min-w-0 flex-1 rounded-md border border-border text-body-sm font-medium text-primary active:bg-elevated"
           >
             提币
+          </button>
+          <button
+            type="button"
+            onClick={() => openWallet('transfer')}
+            className="h-11 min-w-0 flex-1 rounded-md border border-border text-body-sm font-medium text-primary active:bg-elevated"
+          >
+            划转
           </button>
         </div>
 
@@ -70,57 +81,70 @@ export function AssetsPage() {
       </div>
 
       <section className="layout-screen-x mt-5 pb-4">
-        <h2 className="mb-3 text-body-sm font-medium text-secondary">我的资产</h2>
-        <ul className="divide-y divide-border-subtle">
-          {coinBalances.map((coin) => {
-            const walletCoin = coinToWallet[coin.symbol]
+        <div className="mb-3">
+          <ProductModuleTabs
+            active={productModule}
+            onChange={setProductModule}
+          />
+        </div>
 
-            return (
-              <li
-                key={coin.id}
-                className="flex items-center justify-between py-3"
-              >
-                <div className="flex items-center gap-3">
-                  <CoinAvatar symbol={coin.symbol} size={32} />
-                  <div>
-                    <p className="text-body font-medium text-primary">
-                      {coin.symbol}
-                    </p>
-                    <p className="text-caption text-secondary">{coin.chain}</p>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <p className="tabular-nums text-body text-primary">
-                    {formatBalance(coin.balance, coin.symbol)}
-                  </p>
-                  <p className="tabular-nums text-caption text-secondary">
-                    ${formatUsd(coin.usdValue)}
-                  </p>
-                  {walletCoin && (
-                    <div className="mt-1.5 flex justify-end gap-2">
-                      <button
-                        type="button"
-                        onClick={() => openWallet('deposit', { coin: walletCoin })}
-                        className="text-[10px] text-brand"
-                      >
-                        充币
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          openWallet('withdraw', { coin: walletCoin })
-                        }
-                        className="text-[10px] text-secondary"
-                      >
-                        提币
-                      </button>
+        {productModule === 'contract' ? (
+          <ContractAssetsPanel />
+        ) : (
+          <>
+            <h2 className="mb-3 text-body-sm font-medium text-secondary">我的资产</h2>
+            <ul className="divide-y divide-border-subtle">
+              {coinBalances.map((coin) => {
+                const walletCoin = coinToWallet[coin.symbol]
+
+                return (
+                  <li
+                    key={coin.id}
+                    className="flex items-center justify-between py-3"
+                  >
+                    <div className="flex items-center gap-3">
+                      <CoinAvatar symbol={coin.symbol} size={32} />
+                      <div>
+                        <p className="text-body font-medium text-primary">
+                          {coin.symbol}
+                        </p>
+                        <p className="text-caption text-secondary">{coin.chain}</p>
+                      </div>
                     </div>
-                  )}
-                </div>
-              </li>
-            )
-          })}
-        </ul>
+                    <div className="text-right">
+                      <p className="tabular-nums text-body text-primary">
+                        {formatBalance(coin.balance, coin.symbol)}
+                      </p>
+                      <p className="tabular-nums text-caption text-secondary">
+                        ${formatUsd(coin.usdValue)}
+                      </p>
+                      {walletCoin && (
+                        <div className="mt-1.5 flex justify-end gap-2">
+                          <button
+                            type="button"
+                            onClick={() => openWallet('deposit', { coin: walletCoin })}
+                            className="text-[10px] text-brand"
+                          >
+                            充币
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              openWallet('withdraw', { coin: walletCoin })
+                            }
+                            className="text-[10px] text-secondary"
+                          >
+                            提币
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </li>
+                )
+              })}
+            </ul>
+          </>
+        )}
       </section>
     </AppLayout>
   )

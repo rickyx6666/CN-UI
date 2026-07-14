@@ -27,6 +27,15 @@ export function isValidEmail(value: string): boolean {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())
 }
 
+export function isValidPhone(value: string): boolean {
+  return /^1[3-9]\d{9}$/.test(value.trim())
+}
+
+export function isValidAccount(value: string): boolean {
+  const trimmed = value.trim()
+  return isValidEmail(trimmed) || isValidPhone(trimmed)
+}
+
 export function isValidPassword(value: string): boolean {
   return value.length >= 8
 }
@@ -36,6 +45,10 @@ export function isValidOtp(value: string): boolean {
 }
 
 export const authCopy = {
+  accountLabel: '邮箱/手机号',
+  accountPlaceholder: '请输入邮箱或手机号',
+  accountInvalid: '请输入有效邮箱或手机号',
+  registerHint: '使用邮箱或手机号注册 CoinNova 账户',
   loginTitle: '登录',
   registerTitle: '注册',
   verifyTitle: '输入验证码',

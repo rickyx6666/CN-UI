@@ -1,11 +1,13 @@
 import { useMemo, useState } from 'react'
 import { usePrototype } from '../context/PrototypeContext'
+import { contractPairs } from '../data/contract'
 import {
   marketPairs,
   marketTabs,
   portfolioSummary,
   marketQuickActions,
   type MarketTab,
+  type MarketPair,
 } from '../data/mock'
 import { AppLayout } from '../components/AppLayout'
 import { Annotatable } from '../components/inspect/Annotatable'
@@ -14,32 +16,65 @@ import { GuestWelcome } from '../components/GuestWelcome'
 import { GuideBanner } from '../components/GuideBanner'
 import { MarketList } from '../components/MarketList'
 import { MarketTabs } from '../components/MarketTabs'
+import { ProductModuleTabs } from '../components/ProductModuleTabs'
 import { QuickActions } from '../components/QuickActions'
 import { FavoritesGrid } from '../components/market/FavoritesGrid'
 import { MarketListHeader } from '../components/market/MarketListHeader'
 import { MarketSearchBar } from '../components/market/MarketSearchBar'
 
+function filterMarketPairs(
+  pairs: MarketPair[],
+  marketTab: MarketTab,
+  favoritePairIds: string[],
+  query: string,
+  contractMode: boolean,
+) {
+  const q = query.trim().toLowerCase()
+  const base =
+    marketTab === 'favorites'
+      ? pairs.filter((pair) =>
+          contractMode
+            ? favoritePairIds.includes(pair.id.replace('perp-', ''))
+            : favoritePairIds.includes(pair.id),
+        )
+      : pairs
+
+  if (!q) return base
+  return base.filter(
+    (pair) =>
+      pair.symbol.toLowerCase().includes(q) ||
+      pair.base.toLowerCase().includes(q) ||
+      `${pair.base}/${pair.quote}`.toLowerCase().includes(q),
+  )
+}
+
 export function MarketPage() {
-  const { user, openAuth, favoritePairIds, quickAddFavorite } = usePrototype()
+  const {
+    user,
+    openAuth,
+    favoritePairIds,
+    quickAddFavorite,
+    productModule,
+    setProductModule,
+  } = usePrototype()
   const { isLoggedIn } = user
   const [marketTab, setMarketTab] = useState<MarketTab>('market')
   const [query, setQuery] = useState('')
 
-  const filteredPairs = useMemo(() => {
-    const q = query.trim().toLowerCase()
-    const base =
-      marketTab === 'favorites'
-        ? marketPairs.filter((p) => favoritePairIds.includes(p.id))
-        : marketPairs
+  const contractMode = productModule === 'contract'
+  const sourcePairs = contractMode ? contractPairs : marketPairs
 
-    if (!q) return base
-    return base.filter(
-      (p) =>
-        p.symbol.toLowerCase().includes(q) ||
-        p.base.toLowerCase().includes(q) ||
-        `${p.base}/${p.quote}`.toLowerCase().includes(q),
-    )
-  }, [marketTab, favoritePairIds, query])
+  const filteredPairs = useMemo(
+    () =>
+      filterMarketPairs(
+        sourcePairs,
+        marketTab,
+        favoritePairIds,
+        query,
+        contractMode,
+      ),
+    [sourcePairs, marketTab, favoritePairIds, query, contractMode],
+  )
 
   return (
     <AppLayout>
@@ -68,15 +103,15 @@ export function MarketPage() {
       </div>
 
       <div className="layout-screen-x layout-section-divider">
-        <span className="relative inline-block py-3 text-caption font-medium text-primary">
-          现货
-          <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-brand" />
-        </span>
+        <ProductModuleTabs
+          active={productModule}
+          onChange={setProductModule}
+        />
       </div>
 
       {marketTab === 'favorites' ? (
         <>
-          <FavoritesGrid pairs={filteredPairs} />
+          <FavoritesGrid pairs={filteredPairs} contractMode={contractMode} />
           <div className="px-3 pb-3">
             <button
               type="button"
@@ -101,8 +136,8 @@ export function MarketPage() {
         </>
       ) : (
         <>
-          <MarketListHeader />
-          <MarketList pairs={filteredPairs} />
+          <MarketListHeader contractMode={contractMode} />
+          <MarketList pairs={filteredPairs} contractMode={contractMode} />
         </>
       )}
     </AppLayout>

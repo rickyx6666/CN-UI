@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 import { usePrototype } from '../context/PrototypeContext'
+import { antiPhishingDemoScenes } from '../data/antiPhishing'
 import type { BottomTabId, KycStatus } from '../data/mock'
 import { getKycLabel } from '../data/mock'
 import { previewPlatforms } from '../data/platform'
@@ -27,6 +28,8 @@ export function DevPanel() {
     openRegister,
     openAccount,
     openComplianceRestriction,
+    openVersionUpdate,
+    openAntiPhishingDemo,
     openKline,
   } = usePrototype()
   const { inspectMode, toggleInspectMode } = useInspect()
@@ -37,7 +40,7 @@ export function DevPanel() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-52 rounded-lg border border-border bg-elevated p-3 shadow-md">
+    <div className="fixed bottom-4 right-4 z-50 w-60 rounded-lg border border-border bg-elevated p-3 shadow-md">
       <p className="mb-2 text-caption font-semibold uppercase tracking-wide text-brand">
         原型调试
       </p>
@@ -123,6 +126,33 @@ export function DevPanel() {
         >
           地区限制弹窗
         </ToggleBtn>
+      </div>
+
+      <div className="mb-3">
+        <p className="mb-1.5 text-caption text-secondary">版本更新</p>
+        <div className="flex flex-wrap gap-1">
+          <ToggleBtn active={false} onClick={() => openVersionUpdate('force')}>
+            强制更新
+          </ToggleBtn>
+          <ToggleBtn active={false} onClick={() => openVersionUpdate('soft')}>
+            弱更新
+          </ToggleBtn>
+        </div>
+      </div>
+
+      <div className="mb-3">
+        <p className="mb-1.5 text-caption text-secondary">防钓鱼码</p>
+        <div className="grid grid-cols-3 gap-1">
+          {antiPhishingDemoScenes.map((scene) => (
+            <ToggleBtn
+              key={scene.id}
+              active={false}
+              onClick={() => openAntiPhishingDemo(scene.id)}
+            >
+              {scene.label}
+            </ToggleBtn>
+          ))}
+        </div>
       </div>
 
       <div>

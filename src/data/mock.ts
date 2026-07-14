@@ -52,6 +52,7 @@ export interface UserProfile {
   kycStatus: KycStatus
   googleAuthBound: boolean
   paymentPasswordSet: boolean
+  antiPhishingCode: string | null
 }
 
 export const portfolioSummary: PortfolioSummary = {

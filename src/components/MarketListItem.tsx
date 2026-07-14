@@ -6,9 +6,10 @@ import { CoinAvatar } from './CoinAvatar'
 
 interface MarketListItemProps {
   pair: MarketPair
+  contractMode?: boolean
 }
 
-export function MarketListItem({ pair }: MarketListItemProps) {
+export function MarketListItem({ pair, contractMode = false }: MarketListItemProps) {
   const { openTrade, openKline } = usePrototype()
   const isPositive = pair.change24h >= 0
 
@@ -25,6 +26,11 @@ export function MarketListItem({ pair }: MarketListItemProps) {
           <p className="text-body-sm font-medium text-primary">
             {pair.symbol}
             <span className="text-secondary">/{pair.quote}</span>
+            {contractMode && (
+              <span className="ml-1 text-[10px] font-normal text-secondary">
+                永续
+              </span>
+            )}
           </p>
           <p className="tabular-nums text-[10px] text-secondary">
             {formatVolume(pair.volume24h)}

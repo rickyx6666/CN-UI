@@ -6,6 +6,7 @@ export type FundRecordStatus = 'pending' | 'completed' | 'failed'
 export type RecordsScreenName =
   | 'fund'
   | 'fund-detail'
+  | 'deposit-detail'
   | 'orders'
   | 'order-detail'
 
@@ -26,13 +27,19 @@ export interface FundRecord {
   address: string
   txHash: string
   createdAt: number
+  /** 充币：来源地址 */
+  fromAddress?: string
+  /** 充币：已确认区块数 */
+  confirmations?: number
+  /** 充币：所需确认数 */
+  requiredConfirmations?: number
 }
 
 export const recordsCopy = {
   fundTitle: '充提记录',
   fundDetailTitle: '流水详情',
   withdrawDetailTitle: '提现详情',
-  depositDetailTitle: '充值详情',
+  depositDetailTitle: '充币详情',
   ordersTitle: '现货订单',
   orderDetailTitle: '委托详情',
 } as const
@@ -46,8 +53,11 @@ export const mockFundRecords: FundRecord[] = [
     amount: 500,
     fee: 0,
     status: 'completed',
-    address: 'TXk3yP9n8vL2mR4qW6sH1jF5cD7bA9eG0x',
+    address: 'TWkiCUbq191nxF5aRbVN9EqvDVPJLdPpZS',
+    fromAddress: 'TXk3yP9n8vL2mR4qW6sH1jF5cD7bA9eG0x',
     txHash: '0xa1b2c3d4e5f6789012345678901234567890abcd',
+    confirmations: 3,
+    requiredConfirmations: 3,
     createdAt: Date.now() - 86_400_000 * 2,
   },
   {
@@ -57,10 +67,13 @@ export const mockFundRecords: FundRecord[] = [
     chain: 'BSC',
     amount: 2.5,
     fee: 0,
-    status: 'completed',
+    status: 'pending',
     address: '0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb1',
+    fromAddress: '0x8f3A2b1c9d4e5f6789012345678901234567890ab',
     txHash: '0xb2c3d4e5f6789012345678901234567890abcdef12',
-    createdAt: Date.now() - 86_400_000 * 5,
+    confirmations: 8,
+    requiredConfirmations: 15,
+    createdAt: Date.now() - 1_800_000,
   },
   {
     id: 'fund-003',

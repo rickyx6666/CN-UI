@@ -9,6 +9,9 @@ export type AccountScreenName =
   | 'security-email'
   | 'security-login-password'
   | 'security-payment-password'
+  | 'security-anti-phishing'
+  | 'security-anti-phishing-form'
+  | 'security-anti-phishing-verify'
   | 'kyc'
   | 'kyc-sumsub'
   | 'logout'
@@ -18,6 +21,7 @@ export type AccountScreenName =
 
 export interface AccountScreenState {
   screen: AccountScreenName
+  antiPhishingMode?: 'create' | 'change'
 }
 
 export interface SecurityItem {
@@ -25,7 +29,13 @@ export interface SecurityItem {
   label: string
   hint?: string
   screen: AccountScreenName
+  group?: 'basic' | 'advanced'
 }
+
+export const securityGroups = {
+  basic: '基础安全',
+  advanced: '更多安全设置',
+} as const
 
 export const accountCopy = {
   hubTitle: '账户设置',
@@ -60,24 +70,40 @@ export const deleteAccountWarnings = [
 
 export const securityItems: SecurityItem[] = [
   {
-    id: 'google',
-    label: 'Google 验证器',
-    screen: 'security-google',
-  },
-  {
     id: 'email',
     label: '邮箱',
     screen: 'security-email',
+    group: 'basic',
   },
   {
     id: 'login-password',
     label: '登录密码',
     screen: 'security-login-password',
+    group: 'basic',
+  },
+  {
+    id: 'google',
+    label: 'Google 验证器',
+    screen: 'security-google',
+    group: 'basic',
   },
   {
     id: 'payment-password',
     label: '支付密码',
     screen: 'security-payment-password',
+    group: 'basic',
+  },
+  {
+    id: 'phone',
+    label: '手机验证',
+    screen: 'security-email',
+    group: 'advanced',
+  },
+  {
+    id: 'anti-phishing',
+    label: '防钓鱼码',
+    screen: 'security-anti-phishing',
+    group: 'advanced',
   },
 ]
 

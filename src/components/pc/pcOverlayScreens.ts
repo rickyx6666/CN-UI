@@ -9,7 +9,7 @@ export type PcWalletModalScreen =
   | 'withdraw-verify'
   | 'withdraw-success'
 
-export type PcRecordsModalScreen = 'fund' | 'fund-detail'
+export type PcRecordsModalScreen = 'fund' | 'fund-detail' | 'deposit-detail'
 
 const pcWalletModalScreens = new Set<WalletScreenState['screen']>([
   'deposit',
@@ -23,6 +23,7 @@ const pcWalletModalScreens = new Set<WalletScreenState['screen']>([
 const pcRecordsModalScreens = new Set<RecordsScreenState['screen']>([
   'fund',
   'fund-detail',
+  'deposit-detail',
 ])
 
 export function isPcWalletModalScreen(

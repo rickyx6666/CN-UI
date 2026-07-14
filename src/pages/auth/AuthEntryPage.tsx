@@ -5,7 +5,7 @@ import { AuthPageShell } from '../../components/auth/AuthPageShell'
 import { TextField } from '../../components/auth/TextField'
 import {
   authCopy,
-  isValidEmail,
+  isValidAccount,
   isValidPassword,
   type LoginMode,
 } from '../../data/auth'
@@ -33,7 +33,7 @@ export function AuthEntryPage() {
     e.preventDefault()
     const next: typeof errors = {}
 
-    if (!isValidEmail(email)) next.email = '请输入有效邮箱地址'
+    if (!isValidAccount(email)) next.email = authCopy.accountInvalid
 
     if (tab === 'login') {
       if (loginMode === 'password' && !isValidPassword(password)) {
@@ -124,13 +124,13 @@ export function AuthEntryPage() {
 
       <form onSubmit={handleSubmit}>
         <TextField
-          label="邮箱"
-          type="email"
+          label={authCopy.accountLabel}
+          type="text"
           value={email}
           onChange={setEmail}
-          placeholder="name@example.com"
+          placeholder={authCopy.accountPlaceholder}
           error={errors.email}
-          autoComplete="email"
+          autoComplete="username"
         />
 
         {tab === 'login' && loginMode === 'password' && (
@@ -160,7 +160,7 @@ export function AuthEntryPage() {
         {tab === 'register' && (
           <>
             <p className="mb-4 text-body-sm text-secondary">
-              使用邮箱注册 CoinNova 账户
+              {authCopy.registerHint}
             </p>
             <button
               type="button"

@@ -7,7 +7,7 @@ export type FigmaRoute =
   | { type: 'design-system-doc'; slug: string }
   | { type: 'screen'; screen: FigmaScreenEntry }
 
-/** 去掉 Vite base（dev `/`，Pages `/coinlab/`） */
+/** 去掉 Vite base（dev `/`，Pages `/CN-UI/`） */
 export function stripBasePath(pathname: string): string {
   const base = import.meta.env.BASE_URL
   if (base === '/') return pathname
@@ -47,11 +47,17 @@ export function resolveFigmaRoute(appPath: string): FigmaRoute | null {
 }
 
 /** 线上 GitHub Pages 根地址，Figma / html.to.design 导入用 */
-export const FIGMA_PAGES_ORIGIN = 'https://coinlab088.github.io/coinlab'
+export const FIGMA_PAGES_ORIGIN = 'https://rickyx6666.github.io/CN-UI'
 
-/** 完整可粘贴的 Figma 导出直链（始终指向线上） */
+/** 完整可粘贴的 Figma 导出直链；开发环境用 localhost，线上用 GitHub Pages */
 export function figmaExportUrl(path: string): string {
   const slug = path.replace(/^\/+/, '').replace(/\/+$/, '')
+  if (import.meta.env.DEV) {
+    if (typeof window !== 'undefined') {
+      return figmaPageUrl(slug)
+    }
+    return `http://127.0.0.1:5173/figma${slug ? `/${slug}` : ''}`
+  }
   if (!slug) return `${FIGMA_PAGES_ORIGIN}/figma`
   return `${FIGMA_PAGES_ORIGIN}/figma/${slug}`
 }

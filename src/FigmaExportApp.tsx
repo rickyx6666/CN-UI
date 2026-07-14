@@ -6,6 +6,7 @@ import { AppFrame } from './components/platform/AppFrame'
 import { H5ExportFrame } from './components/platform/H5ExportFrame'
 import { PcExportFrame } from './components/platform/PcExportFrame'
 import { ComplianceRestrictionSheet } from './components/sheets/ComplianceRestrictionSheet'
+import { VersionUpdateModal } from './components/sheets/VersionUpdateModal'
 import { SettingsSheets } from './components/sheets/SettingsSheets'
 import { OrderConfirmSheet, PairPickerSheet } from './components/trade/TradeSheets'
 import { AppRouter } from './AppRouter'
@@ -27,6 +28,7 @@ function FigmaOverlays() {
       <PairPickerSheet />
       <OrderConfirmSheet />
       <ComplianceRestrictionSheet />
+      <VersionUpdateModal />
       {figmaToast && <FigmaToast toast={figmaToast} />}
     </>
   )

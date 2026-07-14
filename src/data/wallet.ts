@@ -5,9 +5,13 @@ export type WalletScreenName =
   | 'deposit'
   | 'deposit-fetching'
   | 'deposit-address'
+  | 'deposit-save-success'
   | 'withdraw'
   | 'withdraw-verify'
   | 'withdraw-success'
+  | 'transfer'
+
+export type TransferAccount = 'funding' | 'spot'
 
 export interface WalletScreenState {
   screen: WalletScreenName
@@ -129,10 +133,24 @@ export const walletCopy = {
   depositTitle: '充币',
   depositFetchingTitle: '获取地址',
   depositAddressTitle: '充币地址',
+  depositSaveSuccessTitle: '保存成功',
   withdrawTitle: '提币',
   withdrawVerifyTitle: '安全验证',
   withdrawSuccessTitle: '提币申请已提交',
+  transferTitle: '划转',
 } as const
+
+export const transferAccountLabels: Record<TransferAccount, string> = {
+  funding: '资金账户',
+  spot: '现货账户',
+}
+
+/** 原型演示：资金账户可用余额（与资产页展示一致） */
+export const fundingBalances: Record<WalletCoin, number> = {
+  USDT: 8_420.5,
+  BNB: 4.28,
+  TRX: 12_800,
+}
 
 export function depositKey(coin: WalletCoin, chain: WalletNetwork): string {
   return `${coin}-${chain}`

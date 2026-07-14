@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>CoinNova 邮件模板预览</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 24px; background: #E4E4E7; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; }
+    h1 { margin: 0 0 8px; font-size: 20px; }
+    p.meta { margin: 0 0 24px; color: #52525B; font-size: 14px; }
+    .grid { display: grid; gap: 24px; max-width: 1400px; margin: 0 auto; }
+    @media (min-width: 1100px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+    .card { background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+    .card-head { padding: 16px 20px; border-bottom: 1px solid #F0F0F2; }
+    .card-head h2 { margin: 0 0 4px; font-size: 16px; }
+    .card-head code { font-size: 12px; color: #71717A; }
+    iframe { display: block; width: 100%; height: 720px; border: 0; background: #F4F4F5; }
+    a { color: #0A0A0A; }
+  </style>
+</head>
+<body>
+  <h1>CoinNova 邮箱验证码模板</h1>
+  <p class="meta">登录 · 注册 · 通用 — 三套模板预览。正式文件见同目录 <code>verification-code-*.html</code></p>
+  <div class="grid">
+    <div class="card">
+      <div class="card-head">
+        <h2>登录验证</h2>
+        <code>verification-code-login.html</code>
+      </div>
+      <iframe src="verification-code-login.preview.html" title="登录验证邮件预览"></iframe>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2>注册验证</h2>
+        <code>verification-code-register.html</code>
+      </div>
+      <iframe src="verification-code-register.preview.html" title="注册验证邮件预览"></iframe>
+    </div>
+    <div class="card">
+      <div class="card-head">
+        <h2>通用验证</h2>
+        <code>verification-code-general.html</code>
+      </div>
+      <iframe src="verification-code-general.preview.html" title="通用验证邮件预览"></iframe>
+    </div>
+  </div>
+</body>
+</html>

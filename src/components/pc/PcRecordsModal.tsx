@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { CheckCircle2, ChevronRight } from 'lucide-react'
+import { CheckCircle2, ChevronRight, Clock3 } from 'lucide-react'
 import { CopyButton } from '../common/CopyButton'
 import { PcModalShell } from './PcModalShell'
 import {
@@ -25,7 +25,16 @@ interface PcRecordsModalProps {
 export function PcRecordsModal({ screen, onClose, onNavigate }: PcRecordsModalProps) {
   if (screen === 'fund-detail') {
     return (
-      <PcFundDetailModal
+      <PcWithdrawDetailModal
+        onClose={() => onNavigate({ screen: 'fund' })}
+        onDismiss={onClose}
+      />
+    )
+  }
+
+  if (screen === 'deposit-detail') {
+    return (
+      <PcDepositDetailModal
         onClose={() => onNavigate({ screen: 'fund' })}
         onDismiss={onClose}
       />
@@ -93,7 +102,11 @@ function PcFundHistoryPanel({
               <button
                 type="button"
                 onClick={() =>
-                  onNavigate({ screen: 'fund-detail', fundId: record.id })
+                  onNavigate({
+                    screen:
+                      record.type === 'deposit' ? 'deposit-detail' : 'fund-detail',
+                    fundId: record.id,
+                  })
                 }
                 className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-elevated"
               >
@@ -134,7 +147,7 @@ function PcFundHistoryPanel({
   )
 }
 
-function PcFundDetailModal({
+function PcWithdrawDetailModal({
   onClose,
   onDismiss,
 }: {
@@ -144,12 +157,9 @@ function PcFundDetailModal({
   const { recordsScreen, fundRecords } = usePrototype()
   const record = getFundRecord(recordsScreen?.fundId ?? '', fundRecords)
 
-  if (!record) return null
+  if (!record || record.type !== 'withdraw') return null
 
-  const isWithdraw = record.type === 'withdraw'
-  const title = isWithdraw
-    ? recordsCopy.withdrawDetailTitle
-    : recordsCopy.depositDetailTitle
+  const title = recordsCopy.withdrawDetailTitle
 
   function shortenAddress(value: string) {
     if (value.length <= 12) return value
@@ -159,13 +169,8 @@ function PcFundDetailModal({
   return (
     <PcModalShell title={title} onClose={onClose} maxWidth="max-w-lg" scrollable>
       <div className="mb-6 text-center">
-        <p
-          className={`tabular-nums text-h2 font-semibold ${
-            isWithdraw ? 'text-primary' : 'text-success'
-          }`}
-        >
-          {isWithdraw ? '−' : '+'}
-          {formatTradeAmount(record.amount, record.coin)} {record.coin}
+        <p className="tabular-nums text-h2 font-semibold text-primary">
+          −{formatTradeAmount(record.amount, record.coin)} {record.coin}
         </p>
         {record.status === 'completed' && (
           <div className="mt-2 inline-flex items-center gap-1.5 text-body-sm text-success">
@@ -176,7 +181,7 @@ function PcFundDetailModal({
       </div>
 
       <div className="space-y-4 text-body-sm">
-        <DetailRow label="类型" value={isWithdraw ? '普通提币' : '链上充值'} />
+        <DetailRow label="类型" value="普通提币" />
         <DetailRow label="网络" value={formatNetworkLabel(record.chain)} />
         <div className="flex items-start justify-between gap-4">
           <span className="shrink-0 text-secondary">地址</span>
@@ -199,12 +204,10 @@ function PcFundDetailModal({
           </div>
         )}
         <DetailRow label="日期" value={formatRecordTime(record.createdAt)} />
-        {isWithdraw && (
-          <DetailRow
-            label="手续费"
-            value={`${formatTradeAmount(record.fee, record.coin)} ${record.coin}`}
-          />
-        )}
+        <DetailRow
+          label="手续费"
+          value={`${formatTradeAmount(record.fee, record.coin)} ${record.coin}`}
+        />
       </div>
 
       <button
@@ -215,6 +218,91 @@ function PcFundDetailModal({
         关闭
       </button>
     </PcModalShell>
+  )
+}
+
+function PcDepositDetailModal({
+  onClose,
+  onDismiss,
+}: {
+  onClose: () => void
+  onDismiss: () => void
+}) {
+  const { recordsScreen, fundRecords } = usePrototype()
+  const record = getFundRecord(recordsScreen?.fundId ?? '', fundRecords)
+
+  if (!record || record.type !== 'deposit') return null
+
+  const confirmations = record.confirmations ?? 0
+  const required = record.requiredConfirmations ?? 0
+  const confirmationText =
+    required > 0 ? `${confirmations}/${required} 次网络确认` : '—'
+
+  return (
+    <PcModalShell
+      title={recordsCopy.depositDetailTitle}
+      onClose={onClose}
+      maxWidth="max-w-lg"
+      scrollable
+    >
+      <div className="mb-6 text-center">
+        <p className="tabular-nums text-h2 font-semibold text-success">
+          +{formatTradeAmount(record.amount, record.coin)} {record.coin}
+        </p>
+        {record.status === 'completed' ? (
+          <div className="mt-2 inline-flex items-center gap-1.5 text-body-sm text-success">
+            <CheckCircle2 className="h-4 w-4" strokeWidth={2} />
+            到账成功
+          </div>
+        ) : (
+          <div className="mt-2 inline-flex items-center gap-1.5 text-body-sm text-brand">
+            <Clock3 className="h-4 w-4" strokeWidth={2} />
+            {getFundStatusLabel(record.status)}
+          </div>
+        )}
+      </div>
+
+      <div className="space-y-4 text-body-sm">
+        <DetailRow label="状态" value={getFundStatusLabel(record.status)} />
+        <DetailRow label="类型" value="链上充值" />
+        <DetailRow label="网络" value={formatNetworkLabel(record.chain)} />
+        <DetailRow
+          label="到账数量"
+          value={`${formatTradeAmount(record.amount, record.coin)} ${record.coin}`}
+        />
+        <DetailRow label="区块确认" value={confirmationText} />
+        <PcAddressRow label="充币地址" value={record.address} />
+        {record.fromAddress && (
+          <PcAddressRow label="来源地址" value={record.fromAddress} />
+        )}
+        {record.txHash !== '—' && (
+          <PcAddressRow label="交易 ID" value={record.txHash} />
+        )}
+        <DetailRow label="时间" value={formatRecordTime(record.createdAt)} />
+      </div>
+
+      <button
+        type="button"
+        onClick={onDismiss}
+        className="mt-6 w-full rounded-md border border-border-subtle py-2.5 text-body-sm text-secondary hover:bg-sunken hover:text-primary"
+      >
+        关闭
+      </button>
+    </PcModalShell>
+  )
+}
+
+function PcAddressRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-start justify-between gap-4">
+      <span className="shrink-0 text-secondary">{label}</span>
+      <div className="min-w-0 text-right">
+        <p className="break-all text-primary">{value}</p>
+        <div className="mt-1 flex justify-end">
+          <CopyButton value={value} label="复制" />
+        </div>
+      </div>
+    </div>
   )
 }
 

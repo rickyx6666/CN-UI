@@ -72,10 +72,33 @@ const tabScreens: MobileScreenDef[] = [
     preset: app({ isLoggedIn: true, activeTab: 'market' }),
   },
   {
+    path: 'market/logged-in-contract',
+    label: '行情 · 已登录 · 合约',
+    description: '现货 / 合约切换 · 永续列表',
+    group: 'tab',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      productModule: 'contract',
+    }),
+  },
+  {
     path: 'trade',
     label: '交易',
     group: 'tab',
     preset: app({ isLoggedIn: true, activeTab: 'trade' }),
+  },
+  {
+    path: 'trade/contract',
+    label: '交易 · 合约',
+    description: '开多 / 开空 · 杠杆与盘口',
+    group: 'tab',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'trade',
+      productModule: 'contract',
+      selectedPairId: 'perp-btc',
+    }),
   },
   {
     path: 'assets/guest',
@@ -89,6 +112,18 @@ const tabScreens: MobileScreenDef[] = [
     description: '已认证用户不展示 KYC 标签',
     group: 'tab',
     preset: app({ isLoggedIn: true, activeTab: 'assets', userKycStatus: 'verified' }),
+  },
+  {
+    path: 'assets/logged-in-contract',
+    label: '资产 · 已登录 · 合约',
+    description: '合约权益、保证金与持仓',
+    group: 'tab',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'assets',
+      userKycStatus: 'verified',
+      productModule: 'contract',
+    }),
   },
 ]
 
@@ -326,6 +361,80 @@ const accountScreens: MobileScreenDef[] = [
     }),
   },
   {
+    path: 'account/security-anti-phishing',
+    label: '防钓鱼码 · 介绍',
+    description: '未设置时展示说明与创建入口',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'security-anti-phishing' },
+      userAntiPhishingCode: null,
+    }),
+  },
+  {
+    path: 'account/security-anti-phishing-set',
+    label: '防钓鱼码 · 已设置',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'security-anti-phishing' },
+      userAntiPhishingCode: '12NovaA',
+    }),
+  },
+  {
+    path: 'account/security-anti-phishing-how-it-works',
+    label: '防钓鱼码 · 如何运作',
+    description: '已设置页点击说明后的 Bottom Sheet',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'security-anti-phishing' },
+      userAntiPhishingCode: '12NovaA',
+      antiPhishingOverlay: 'how-it-works',
+    }),
+  },
+  {
+    path: 'account/security-anti-phishing-create',
+    label: '防钓鱼码 · 创建',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: {
+        screen: 'security-anti-phishing-form',
+        antiPhishingMode: 'create',
+      },
+    }),
+  },
+  {
+    path: 'account/security-anti-phishing-change',
+    label: '防钓鱼码 · 更改',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: {
+        screen: 'security-anti-phishing-form',
+        antiPhishingMode: 'change',
+      },
+      userAntiPhishingCode: '12NovaA',
+    }),
+  },
+  {
+    path: 'account/security-anti-phishing-verify',
+    label: '防钓鱼码 · 安全验证',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'security-anti-phishing-verify' },
+      antiPhishingDraft: '12NovaA',
+    }),
+  },
+  {
     path: 'account/kyc',
     label: '身份认证 · 未认证',
     group: 'account',
@@ -455,6 +564,17 @@ const walletScreens: MobileScreenDef[] = [
     }),
   },
   {
+    path: 'wallet/deposit-save-success',
+    label: '充币 · 保存成功',
+    description: '保存到相册后的图片内容预览',
+    group: 'wallet',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'assets',
+      walletScreen: { screen: 'deposit-save-success', coin: 'USDT', chain: 'TRC20' },
+    }),
+  },
+  {
     path: 'wallet/withdraw',
     label: '提币',
     description: '未设支付密码时引导前往设置',
@@ -463,6 +583,17 @@ const walletScreens: MobileScreenDef[] = [
       isLoggedIn: true,
       activeTab: 'assets',
       walletScreen: { screen: 'withdraw' },
+    }),
+  },
+  {
+    path: 'wallet/transfer',
+    label: '划转',
+    description: '资金账户与现货账户互转',
+    group: 'wallet',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'assets',
+      walletScreen: { screen: 'transfer' },
     }),
   },
   {
@@ -503,12 +634,33 @@ const recordsScreens: MobileScreenDef[] = [
   },
   {
     path: 'records/fund-detail',
-    label: '提现详情',
+    label: '提币详情',
     group: 'records',
     preset: app({
       isLoggedIn: true,
       activeTab: 'assets',
       recordsScreen: { screen: 'fund-detail', fundId: 'fund-003' },
+    }),
+  },
+  {
+    path: 'records/deposit-detail',
+    label: '充币详情',
+    description: '链上充值到账记录',
+    group: 'records',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'assets',
+      recordsScreen: { screen: 'deposit-detail', fundId: 'fund-001' },
+    }),
+  },
+  {
+    path: 'records/deposit-detail-pending',
+    label: '充币详情 · 确认中',
+    group: 'records',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'assets',
+      recordsScreen: { screen: 'deposit-detail', fundId: 'fund-002' },
     }),
   },
   {
@@ -658,6 +810,28 @@ const overlayScreens: MobileScreenDef[] = [
       isLoggedIn: true,
       activeTab: 'trade',
       showComplianceRestriction: true,
+    }),
+  },
+  {
+    path: 'overlay/alert-version-force',
+    label: 'Alert Dialog · 强制更新',
+    description: '不可关闭，必须更新后才能继续使用',
+    group: 'overlay',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      showVersionUpdate: 'force',
+    }),
+  },
+  {
+    path: 'overlay/alert-version-soft',
+    label: 'Alert Dialog · 弱更新',
+    description: '可稍后提醒，支持关闭',
+    group: 'overlay',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      showVersionUpdate: 'soft',
     }),
   },
   {

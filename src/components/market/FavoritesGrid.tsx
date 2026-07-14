@@ -5,9 +5,10 @@ import { usePrototype } from '../../context/PrototypeContext'
 
 interface FavoritesGridProps {
   pairs: MarketPair[]
+  contractMode?: boolean
 }
 
-export function FavoritesGrid({ pairs }: FavoritesGridProps) {
+export function FavoritesGrid({ pairs, contractMode = false }: FavoritesGridProps) {
   const { openTrade, toggleFavorite, isFavorite } = usePrototype()
 
   if (pairs.length === 0) {
@@ -38,7 +39,9 @@ export function FavoritesGrid({ pairs }: FavoritesGridProps) {
                 {pair.base}
                 <span className="font-normal text-secondary">/{pair.quote}</span>
               </p>
-              <p className="mt-2 text-[10px] text-secondary">现货</p>
+              <p className="mt-2 text-[10px] text-secondary">
+                {contractMode ? '永续' : '现货'}
+              </p>
               <p
                 className={`mt-1 tabular-nums text-caption ${
                   isPositive ? 'text-success' : 'text-danger'

@@ -4,12 +4,14 @@ import { formatChangePercent } from '../../data/mock'
 
 interface TradePairBarProps {
   pair: MarketPair
+  subtitle?: string
   onSelectPair: () => void
   onOpenKline?: () => void
 }
 
 export function TradePairBar({
   pair,
+  subtitle,
   onSelectPair,
   onOpenKline,
 }: TradePairBarProps) {
@@ -33,6 +35,9 @@ export function TradePairBar({
         >
           {formatChangePercent(pair.change24h)}
         </span>
+        {subtitle && (
+          <span className="ml-2 text-[10px] text-secondary">{subtitle}</span>
+        )}
       </button>
       <button
         type="button"

@@ -4,7 +4,7 @@ import { AuthPageShell } from '../../components/auth/AuthPageShell'
 import { TextField } from '../../components/auth/TextField'
 import {
   authCopy,
-  isValidEmail,
+  isValidAccount,
   isValidPassword,
   type LoginMode,
 } from '../../data/auth'
@@ -20,7 +20,7 @@ export function LoginPage() {
 
   function validate() {
     const next: typeof errors = {}
-    if (!isValidEmail(email)) next.email = '请输入有效邮箱地址'
+    if (!isValidAccount(email)) next.email = authCopy.accountInvalid
     if (mode === 'password' && !isValidPassword(password)) {
       next.password = '密码至少 8 位'
     }
@@ -82,13 +82,13 @@ export function LoginPage() {
 
       <form onSubmit={handleSubmit}>
         <TextField
-          label="邮箱"
-          type="email"
+          label={authCopy.accountLabel}
+          type="text"
           value={email}
           onChange={setEmail}
-          placeholder="name@example.com"
+          placeholder={authCopy.accountPlaceholder}
           error={errors.email}
-          autoComplete="email"
+          autoComplete="username"
         />
 
         {mode === 'password' && (

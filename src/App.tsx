@@ -6,6 +6,7 @@ import { PlatformSwitcher } from './components/platform/PlatformSwitcher'
 import { ViewportShell } from './components/platform/ViewportShell'
 import { SettingsSheets } from './components/sheets/SettingsSheets'
 import { ComplianceRestrictionSheet } from './components/sheets/ComplianceRestrictionSheet'
+import { VersionUpdateModal } from './components/sheets/VersionUpdateModal'
 import { OrderConfirmSheet, PairPickerSheet } from './components/trade/TradeSheets'
 import { InspectProvider } from './context/InspectContext'
 import { PrototypeProvider } from './context/PrototypeContext'
@@ -25,6 +26,7 @@ export default function App() {
                 <PairPickerSheet />
                 <OrderConfirmSheet />
                 <ComplianceRestrictionSheet />
+                <VersionUpdateModal />
               </AppShell>
             </ViewportShell>
           </div>

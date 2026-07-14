@@ -9,6 +9,7 @@ import { CoinAvatar } from '../../components/CoinAvatar'
 import {
   deleteAccountWarnings,
   maskEmail,
+  securityGroups,
   securityItems,
 } from '../../data/account'
 import { getKycLabel, getKycValueClassName } from '../../data/mock'
@@ -309,25 +310,21 @@ function AccountActionModal({
               </button>
             </div>
             <p className="mb-5 text-body-sm text-secondary">
-              建议开启 Google 验证器并设置支付密码，保护您的资产安全。
+              为保护您的资产安全，请妥善保管账号与密码。
             </p>
-            <div className="overflow-hidden rounded-2xl border border-border-subtle bg-sunken">
-              {securityItems.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => onOpenSecurityItem(item.screen)}
-                  className="flex w-full items-center justify-between border-b border-border-subtle px-5 py-4 text-left last:border-b-0 hover:bg-base"
-                >
-                  <p className="text-body-sm text-primary">{item.label}</p>
-                  <div className="flex items-center gap-2">
-                    <span className="text-body-sm text-secondary">
-                      {getSecurityValue(item.id, user)}
-                    </span>
-                    <ChevronRight className="h-4 w-4 text-secondary" strokeWidth={1.5} />
-                  </div>
-                </button>
-              ))}
+            <div className="space-y-4">
+              <SecuritySection
+                title={securityGroups.basic}
+                items={securityItems.filter((item) => item.group === 'basic')}
+                user={user}
+                onOpenSecurityItem={onOpenSecurityItem}
+              />
+              <SecuritySection
+                title={securityGroups.advanced}
+                items={securityItems.filter((item) => item.group === 'advanced')}
+                user={user}
+                onOpenSecurityItem={onOpenSecurityItem}
+              />
             </div>
           </>
         ) : (
@@ -396,6 +393,44 @@ function AccountActionModal({
   )
 }
 
+function SecuritySection({
+  title,
+  items,
+  user,
+  onOpenSecurityItem,
+}: {
+  title: string
+  items: (typeof securityItems)[number][]
+  user: ReturnType<typeof usePrototype>['user']
+  onOpenSecurityItem: (
+    screen: (typeof securityItems)[number]['screen'],
+  ) => void
+}) {
+  return (
+    <div>
+      <p className="mb-2 text-caption font-semibold text-secondary">{title}</p>
+      <div className="overflow-hidden rounded-2xl border border-border-subtle bg-sunken">
+        {items.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => onOpenSecurityItem(item.screen)}
+            className="flex w-full items-center justify-between border-b border-border-subtle px-5 py-4 text-left last:border-b-0 hover:bg-base"
+          >
+            <p className="text-body-sm text-primary">{item.label}</p>
+            <div className="flex items-center gap-2">
+              <span className="text-body-sm text-secondary">
+                {getSecurityValue(item.id, user)}
+              </span>
+              <ChevronRight className="h-4 w-4 text-secondary" strokeWidth={1.5} />
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function getSecurityValue(
   id: string,
   user: ReturnType<typeof usePrototype>['user'],
@@ -409,6 +444,10 @@ function getSecurityValue(
       return '修改'
     case 'payment-password':
       return user.paymentPasswordSet ? '已设置' : '未设置'
+    case 'phone':
+      return '未验证'
+    case 'anti-phishing':
+      return user.antiPhishingCode ? '已设置' : '未设置'
     default:
       return undefined
   }

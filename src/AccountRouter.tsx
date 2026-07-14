@@ -14,6 +14,9 @@ import { SecurityEmailPage } from './pages/account/SecurityEmailPage'
 import { SecurityGoogleSetupPage } from './pages/account/SecurityGoogleSetupPage'
 import { SecurityGooglePage } from './pages/account/SecurityGooglePage'
 import { SecurityGoogleVerifyPage } from './pages/account/SecurityGoogleVerifyPage'
+import { AntiPhishingFormPage } from './pages/account/AntiPhishingFormPage'
+import { AntiPhishingPage } from './pages/account/AntiPhishingPage'
+import { AntiPhishingVerifyPage } from './pages/account/AntiPhishingVerifyPage'
 import { SecuritySettingsPage } from './pages/account/SecuritySettingsPage'
 
 export function AccountRouter() {
@@ -42,6 +45,12 @@ export function AccountRouter() {
       return <ChangeLoginPasswordPage />
     case 'security-payment-password':
       return <PaymentPasswordPage />
+    case 'security-anti-phishing':
+      return <AntiPhishingPage />
+    case 'security-anti-phishing-form':
+      return <AntiPhishingFormPage />
+    case 'security-anti-phishing-verify':
+      return <AntiPhishingVerifyPage />
     case 'kyc':
       return <KycPage />
     case 'kyc-sumsub':

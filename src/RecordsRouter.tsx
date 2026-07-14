@@ -1,4 +1,5 @@
 import { usePrototype } from './context/PrototypeContext'
+import { DepositDetailPage } from './pages/records/DepositDetailPage'
 import { FundDetailPage } from './pages/records/FundDetailPage'
 import { FundHistoryPage } from './pages/records/FundHistoryPage'
 import { OrderDetailPage } from './pages/records/OrderDetailPage'
@@ -14,6 +15,8 @@ export function RecordsRouter() {
       return <FundHistoryPage />
     case 'fund-detail':
       return <FundDetailPage />
+    case 'deposit-detail':
+      return <DepositDetailPage />
     case 'orders':
       return <OrderHistoryPage />
     case 'order-detail':

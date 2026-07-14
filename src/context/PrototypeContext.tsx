@@ -7,9 +7,15 @@ import {
   type ReactNode,
 } from 'react'
 import type { AccountScreenState } from '../data/account'
+import type { AntiPhishingDemoScene } from '../data/antiPhishing'
 import type { AuthScreenState } from '../data/auth'
 import { marketPairs } from '../data/mock'
 import type { ComplianceRestrictionOptions } from '../data/compliance'
+import {
+  defaultVersionUpdateInfo,
+  type VersionUpdateInfo,
+  type VersionUpdateVariant,
+} from '../data/versionUpdate'
 import type { SettingsSheet } from '../data/settings'
 import {
   applyMarketFill,
@@ -40,12 +46,16 @@ import type { PreviewPlatform } from '../data/platform'
 import { loadAppTheme, saveAppTheme, type AppTheme } from '../data/appTheme'
 import type { PrototypePreset, FigmaToastPreset } from '../figma/types'
 import type { AppToastState, ToastVariant } from '../data/feedback'
+import type { ProductModule } from '../data/productModule'
+import { isContractPairId } from '../data/productModule'
 
 interface PrototypeContextValue {
   isLoggedIn: boolean
   setLoggedIn: (value: boolean) => void
   activeTab: BottomTabId
   setActiveTab: (tab: BottomTabId) => void
+  productModule: ProductModule
+  setProductModule: (module: ProductModule) => void
   user: UserProfile
   updateProfile: (patch: Partial<Omit<UserProfile, 'isLoggedIn'>>) => void
   locale: string
@@ -91,9 +101,24 @@ interface PrototypeContextValue {
   complianceModule: string | null
   openComplianceRestriction: (options?: ComplianceRestrictionOptions) => void
   closeComplianceRestriction: () => void
+  versionUpdateVariant: VersionUpdateVariant | null
+  versionUpdateInfo: VersionUpdateInfo
+  openVersionUpdate: (
+    variant: VersionUpdateVariant,
+    info?: Partial<VersionUpdateInfo>,
+  ) => void
+  closeVersionUpdate: () => void
   walletScreen: WalletScreenState | null
   withdrawDraft: WithdrawDraft | null
-  openWallet: (flow: 'deposit' | 'withdraw', options?: { coin?: WalletCoin }) => void
+  antiPhishingDraft: string | null
+  setAntiPhishingDraft: (code: string | null) => void
+  antiPhishingOverlay: 'how-it-works' | null
+  clearAntiPhishingOverlay: () => void
+  openAntiPhishingDemo: (scene: AntiPhishingDemoScene) => void
+  openWallet: (
+    flow: 'deposit' | 'withdraw' | 'transfer',
+    options?: { coin?: WalletCoin },
+  ) => void
   closeWallet: () => void
   navigateWallet: (screen: WalletScreenState) => void
   setWithdrawDraft: (draft: WithdrawDraft | null) => void
@@ -123,6 +148,7 @@ interface PrototypeContextValue {
   figmaExport: boolean
   figmaPcViewport: 'fixed' | 'document'
   figmaWalletOverlay: 'deposit-share' | null
+  figmaAntiPhishingOverlay: 'how-it-works' | null
   figmaTradeOverlay: 'order-book-depth' | null
   figmaAccountOverlay: 'security' | 'logout' | 'delete' | null
   toast: AppToastState | null
@@ -140,6 +166,7 @@ const loggedInProfileDefaults: Omit<UserProfile, 'isLoggedIn'> = {
   kycStatus: 'pending' satisfies KycStatus,
   googleAuthBound: true,
   paymentPasswordSet: false,
+  antiPhishingCode: null,
 }
 
 const guestProfile: UserProfile = {
@@ -151,6 +178,7 @@ const guestProfile: UserProfile = {
   kycStatus: 'unverified',
   googleAuthBound: false,
   paymentPasswordSet: false,
+  antiPhishingCode: null,
 }
 
 function createOrderId() {
@@ -178,8 +206,14 @@ export function PrototypeProvider({
     ...(preset?.userPaymentPasswordSet !== undefined
       ? { paymentPasswordSet: preset.userPaymentPasswordSet }
       : {}),
+    ...(preset?.userAntiPhishingCode !== undefined
+      ? { antiPhishingCode: preset.userAntiPhishingCode }
+      : {}),
   })
   const [activeTab, setActiveTab] = useState<BottomTabId>(preset?.activeTab ?? 'market')
+  const [productModule, setProductModule] = useState<ProductModule>(
+    preset?.productModule ?? 'spot',
+  )
   const [authScreen, setAuthScreen] = useState<AuthScreenState | null>(
     preset?.authScreen ?? null,
   )
@@ -189,7 +223,9 @@ export function PrototypeProvider({
   const [locale, setLocale] = useState('zh-CN')
   const [fiat, setFiat] = useState('USD')
   const [activeSheet, setActiveSheet] = useState<SettingsSheet>(preset?.activeSheet ?? null)
-  const [selectedPairId, setSelectedPairId] = useState(marketPairs[0].id)
+  const [selectedPairId, setSelectedPairId] = useState(
+    preset?.selectedPairId ?? marketPairs[0].id,
+  )
   const [spotBalances, setSpotBalances] = useState<SpotBalance[]>(
     defaultSpotBalances.map((b) => ({ ...b })),
   )
@@ -205,12 +241,23 @@ export function PrototypeProvider({
   const [showComplianceRestriction, setShowComplianceRestriction] =
     useState(preset?.showComplianceRestriction ?? false)
   const [complianceModule, setComplianceModule] = useState<string | null>(null)
+  const [versionUpdateVariant, setVersionUpdateVariant] =
+    useState<VersionUpdateVariant | null>(preset?.showVersionUpdate ?? null)
+  const [versionUpdateInfo, setVersionUpdateInfo] = useState<VersionUpdateInfo>(
+    () => ({ ...defaultVersionUpdateInfo }),
+  )
   const [walletScreen, setWalletScreen] = useState<WalletScreenState | null>(
     preset?.walletScreen ?? null,
   )
   const [withdrawDraft, setWithdrawDraft] = useState<WithdrawDraft | null>(
     preset?.withdrawDraft ?? null,
   )
+  const [antiPhishingDraft, setAntiPhishingDraft] = useState<string | null>(
+    preset?.antiPhishingDraft ?? null,
+  )
+  const [antiPhishingOverlay, setAntiPhishingOverlay] = useState<
+    'how-it-works' | null
+  >(preset?.antiPhishingOverlay ?? null)
   const [supportScreen, setSupportScreen] = useState<SupportScreenState | null>(
     preset?.supportScreen ?? null,
   )
@@ -234,6 +281,7 @@ export function PrototypeProvider({
   const figmaExport = preset?.figmaExport ?? false
   const figmaPcViewport = preset?.figmaPcViewport ?? 'document'
   const figmaWalletOverlay = preset?.walletOverlay ?? null
+  const figmaAntiPhishingOverlay = preset?.antiPhishingOverlay ?? null
   const figmaTradeOverlay = preset?.tradeOverlay ?? null
   const figmaAccountOverlay = preset?.accountOverlay ?? null
   const [toast, setToast] = useState<AppToastState | null>(null)
@@ -310,6 +358,55 @@ export function PrototypeProvider({
     setAccountScreen(screen)
   }, [])
 
+  const clearAntiPhishingOverlay = useCallback(() => {
+    setAntiPhishingOverlay(null)
+  }, [])
+
+  const openAntiPhishingDemo = useCallback(
+    (scene: AntiPhishingDemoScene) => {
+      setLoggedIn(true)
+      setAuthScreen(null)
+      setAntiPhishingOverlay(null)
+      setAntiPhishingDraft(null)
+
+      switch (scene) {
+        case 'intro':
+          setProfile((prev) => ({ ...prev, antiPhishingCode: null }))
+          setAccountScreen({ screen: 'security-anti-phishing' })
+          break
+        case 'set':
+          setProfile((prev) => ({ ...prev, antiPhishingCode: '12NovaA' }))
+          setAccountScreen({ screen: 'security-anti-phishing' })
+          break
+        case 'how-it-works':
+          setProfile((prev) => ({ ...prev, antiPhishingCode: '12NovaA' }))
+          setAntiPhishingOverlay('how-it-works')
+          setAccountScreen({ screen: 'security-anti-phishing' })
+          break
+        case 'create':
+          setProfile((prev) => ({ ...prev, antiPhishingCode: null }))
+          setAccountScreen({
+            screen: 'security-anti-phishing-form',
+            antiPhishingMode: 'create',
+          })
+          break
+        case 'change':
+          setProfile((prev) => ({ ...prev, antiPhishingCode: '12NovaA' }))
+          setAccountScreen({
+            screen: 'security-anti-phishing-form',
+            antiPhishingMode: 'change',
+          })
+          break
+        case 'verify':
+          setProfile((prev) => ({ ...prev, antiPhishingCode: '12NovaA' }))
+          setAntiPhishingDraft('12NovaB')
+          setAccountScreen({ screen: 'security-anti-phishing-verify' })
+          break
+      }
+    },
+    [],
+  )
+
   const logout = useCallback(() => {
     setLoggedIn(false)
     setAccountScreen(null)
@@ -331,7 +428,10 @@ export function PrototypeProvider({
   }, [])
 
   const openTrade = useCallback((pairId?: string) => {
-    if (pairId) setSelectedPairId(pairId)
+    if (pairId) {
+      setSelectedPairId(pairId)
+      setProductModule(isContractPairId(pairId) ? 'contract' : 'spot')
+    }
     setActiveTab('trade')
   }, [])
 
@@ -463,8 +563,32 @@ export function PrototypeProvider({
     setComplianceModule(null)
   }, [])
 
+  const openVersionUpdate = useCallback(
+    (variant: VersionUpdateVariant, info?: Partial<VersionUpdateInfo>) => {
+      setVersionUpdateVariant(variant)
+      if (info) {
+        setVersionUpdateInfo((prev) => ({ ...prev, ...info }))
+      } else {
+        setVersionUpdateInfo({ ...defaultVersionUpdateInfo })
+      }
+    },
+    [],
+  )
+
+  const closeVersionUpdate = useCallback(() => {
+    setVersionUpdateVariant(null)
+  }, [])
+
   const openWallet = useCallback(
-    (flow: 'deposit' | 'withdraw', options?: { coin?: WalletCoin }) => {
+    (
+      flow: 'deposit' | 'withdraw' | 'transfer',
+      options?: { coin?: WalletCoin },
+    ) => {
+      if (flow === 'transfer') {
+        setWalletScreen({ screen: 'transfer', coin: options?.coin })
+        return
+      }
+
       if (flow === 'withdraw') {
         setWalletScreen({ screen: 'withdraw', coin: options?.coin })
         return
@@ -584,6 +708,8 @@ export function PrototypeProvider({
       },
       activeTab,
       setActiveTab,
+      productModule,
+      setProductModule,
       user,
       updateProfile,
       locale,
@@ -629,12 +755,21 @@ export function PrototypeProvider({
       complianceModule,
       openComplianceRestriction,
       closeComplianceRestriction,
+      versionUpdateVariant,
+      versionUpdateInfo,
+      openVersionUpdate,
+      closeVersionUpdate,
       walletScreen,
       withdrawDraft,
+      antiPhishingDraft,
+      antiPhishingOverlay,
+      clearAntiPhishingOverlay,
+      openAntiPhishingDemo,
       openWallet,
       closeWallet,
       navigateWallet,
       setWithdrawDraft,
+      setAntiPhishingDraft,
       activatedDepositKeys,
       isDepositActivated,
       activateDeposit,
@@ -661,6 +796,7 @@ export function PrototypeProvider({
       figmaExport,
       figmaPcViewport,
       figmaWalletOverlay,
+      figmaAntiPhishingOverlay,
       figmaTradeOverlay,
       figmaAccountOverlay,
       toast,
@@ -670,6 +806,7 @@ export function PrototypeProvider({
     [
       isLoggedIn,
       activeTab,
+      productModule,
       user,
       updateProfile,
       locale,
@@ -712,12 +849,21 @@ export function PrototypeProvider({
       complianceModule,
       openComplianceRestriction,
       closeComplianceRestriction,
+      versionUpdateVariant,
+      versionUpdateInfo,
+      openVersionUpdate,
+      closeVersionUpdate,
       walletScreen,
       withdrawDraft,
+      antiPhishingDraft,
+      antiPhishingOverlay,
+      clearAntiPhishingOverlay,
+      openAntiPhishingDemo,
       openWallet,
       closeWallet,
       navigateWallet,
       setWithdrawDraft,
+      setAntiPhishingDraft,
       supportScreen,
       openHelpCenter,
       openSupportCenter,
@@ -745,6 +891,7 @@ export function PrototypeProvider({
       figmaExport,
       figmaPcViewport,
       figmaWalletOverlay,
+      figmaAntiPhishingOverlay,
       figmaTradeOverlay,
       figmaAccountOverlay,
       toast,

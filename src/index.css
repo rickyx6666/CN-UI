@@ -281,3 +281,15 @@ html[data-figma-export] h2,
 html[data-figma-export] button {
   opacity: 1 !important;
 }
+
+/* dMaya / html.to.design：部分插件无法稳定解析 CSS 变量，主按钮写死品牌色 */
+html[data-figma-export] button.bg-brand {
+  background-color: #ffcc00 !important;
+  color: #000000 !important;
+}
+
+html[data-figma-export] button.border-border.text-primary {
+  background-color: transparent !important;
+  border-color: #2a2a2a !important;
+  color: #ffffff !important;
+}

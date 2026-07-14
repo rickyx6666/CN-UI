@@ -19,7 +19,7 @@ npm install
 npm run dev
 ```
 
-浏览器打开 `http://localhost:5173/`，页面以 **390px** 移动端容器展示。
+浏览器打开 **http://localhost:5173/**（固定端口；Cash Caw 项目用 **5175**）。保存后自动整页刷新。
 
 ## 文档约定
 
