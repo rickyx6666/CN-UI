@@ -17,6 +17,7 @@ interface OrderBookProps {
   asks: OrderBookLevel[]
   bids: OrderBookLevel[]
   onPriceSelect?: (price: number) => void
+  showDepthRatio?: boolean
 }
 
 function DepthBar({
@@ -36,9 +37,17 @@ function DepthBar({
   )
 }
 
-export function OrderBook({ pair, asks, bids, onPriceSelect }: OrderBookProps) {
+export function OrderBook({
+  pair,
+  asks,
+  bids,
+  onPriceSelect,
+  showDepthRatio = false,
+}: OrderBookProps) {
   const { figmaTradeOverlay } = usePrototype()
-  const [depth, setDepth] = useState<OrderBookDepth>('0.0001')
+  const [depth, setDepth] = useState<OrderBookDepth>(
+    showDepthRatio ? '0.1' : '0.0001',
+  )
   const [depthSheetOpen, setDepthSheetOpen] = useState(
     figmaTradeOverlay === 'order-book-depth',
   )
@@ -47,6 +56,11 @@ export function OrderBook({ pair, asks, bids, onPriceSelect }: OrderBookProps) {
     ...asks.map((l) => l.amount),
     ...bids.map((l) => l.amount),
   )
+  const bidTotal = bids.reduce((sum, level) => sum + level.amount, 0)
+  const askTotal = asks.reduce((sum, level) => sum + level.amount, 0)
+  const depthTotal = bidTotal + askTotal
+  const bidRatio = depthTotal > 0 ? (bidTotal / depthTotal) * 100 : 50
+  const askRatio = 100 - bidRatio
   const isPositive = pair.change24h >= 0
 
   function formatLevelPrice(price: number) {
@@ -110,6 +124,25 @@ export function OrderBook({ pair, asks, bids, onPriceSelect }: OrderBookProps) {
           </button>
         ))}
       </div>
+
+      {showDepthRatio && (
+        <div className="mb-1.5">
+          <div className="flex h-1 overflow-hidden rounded-full">
+            <span
+              className="bg-success/70"
+              style={{ width: `${bidRatio}%` }}
+            />
+            <span
+              className="bg-danger/70"
+              style={{ width: `${askRatio}%` }}
+            />
+          </div>
+          <div className="mt-1 flex justify-between text-[9px] tabular-nums">
+            <span className="text-success">{bidRatio.toFixed(2)}%</span>
+            <span className="text-danger">{askRatio.toFixed(2)}%</span>
+          </div>
+        </div>
+      )}
 
       <button
         type="button"

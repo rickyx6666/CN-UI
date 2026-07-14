@@ -1,11 +1,17 @@
 import { useMemo, useState } from 'react'
 import { usePrototype } from '../context/PrototypeContext'
-import { contractPairs, contractPairLabel } from '../data/contract'
+import {
+  contractPairs,
+  type ContractMarketType,
+} from '../data/contract'
 import { marketPairs } from '../data/mock'
 import { generateOrderBook } from '../data/trade'
 import { AppLayout } from '../components/AppLayout'
 import { Annotatable } from '../components/inspect/Annotatable'
 import { ProductModuleTabs } from '../components/ProductModuleTabs'
+import { ContractBottomPanel } from '../components/contract/ContractBottomPanel'
+import { ContractPairBar } from '../components/contract/ContractPairBar'
+import { ContractSubTabs } from '../components/contract/ContractSubTabs'
 import { ContractTradePanel } from '../components/contract/ContractTradePanel'
 import { OrderBook } from '../components/trade/OrderBook'
 import { OrderForm } from '../components/trade/OrderForm'
@@ -30,6 +36,8 @@ export function TradePage() {
   } = usePrototype()
 
   const [selectedPrice, setSelectedPrice] = useState<number | null>(null)
+  const [contractMarketType, setContractMarketType] =
+    useState<ContractMarketType>('usdt')
   const contractMode = productModule === 'contract'
 
   const pair = useMemo(() => {
@@ -57,21 +65,47 @@ export function TradePage() {
         />
       </div>
 
-      <TradePairBar
-        pair={pair}
-        subtitle={contractMode ? contractPairLabel(pair) : undefined}
-        onSelectPair={() => openTradeSheet('pair-picker')}
-        onOpenKline={() => openKline(pair.id)}
-      />
-
       {contractMode ? (
-        <ContractTradePanel
-          pair={pair}
-          isLoggedIn={user.isLoggedIn}
-          onLogin={openAuth}
-        />
+        <>
+          <ContractSubTabs
+            active={contractMarketType}
+            onChange={setContractMarketType}
+          />
+          <ContractPairBar
+            pair={pair}
+            onSelectPair={() => openTradeSheet('pair-picker')}
+            onOpenKline={() => openKline(pair.id)}
+          />
+          <div className="flex items-start gap-1.5 px-3 pb-2">
+            <OrderBook
+              pair={pair}
+              asks={asks}
+              bids={bids}
+              showDepthRatio
+              onPriceSelect={setSelectedPrice}
+            />
+            <Annotatable id="contract-trade-panel">
+              <ContractTradePanel
+                pair={pair}
+                isLoggedIn={user.isLoggedIn}
+                onLogin={openAuth}
+              />
+            </Annotatable>
+          </div>
+          <ContractBottomPanel
+            pair={pair}
+            isLoggedIn={user.isLoggedIn}
+            onOpenKline={() => openKline(pair.id)}
+          />
+        </>
       ) : (
         <>
+          <TradePairBar
+            pair={pair}
+            onSelectPair={() => openTradeSheet('pair-picker')}
+            onOpenKline={() => openKline(pair.id)}
+          />
+
           <div className="flex items-start gap-2 px-3 pb-2">
             <Annotatable id="trade-order-form">
               <OrderForm
