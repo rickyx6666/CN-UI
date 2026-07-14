@@ -39,7 +39,7 @@ export function AccountSecurityVerifyPage() {
   const meta = getSecurityVerifyMeta(purpose, user)
 
   function handleBack() {
-    navigateAccount(meta.backScreen(user))
+    navigateAccount(meta.backScreen())
   }
 
   function handleSubmit(e: React.FormEvent) {

@@ -1,7 +1,7 @@
 import { Copy, Plus, X } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import type { AccountScreenState } from '../../data/account'
-import { securityVerifyScreen } from '../../data/account'
+import { accountCopy, securityVerifyScreen } from '../../data/account'
 import { isValidOtp } from '../../data/auth'
 import { usePrototype } from '../../context/PrototypeContext'
 import { AuthButton } from '../auth/AuthButton'
