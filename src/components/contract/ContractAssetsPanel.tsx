@@ -1,29 +1,18 @@
-import { FileClock } from 'lucide-react'
-import { contractPortfolioSummary, contractPositions } from '../../data/contract'
+import {
+  contractPortfolioSummary,
+  contractPositions,
+} from '../../data/contract'
 import { approximateCny } from '../../data/assets'
 import { formatUsd } from '../../data/mock'
-import { usePrototype } from '../../context/PrototypeContext'
 import { ContractPositionCard } from './ContractPositionCard'
 
 export function ContractAssetsPanel() {
-  const {
-    openContractHistory,
-    openWallet,
-    setActiveTab,
-    setProductModule,
-  } = usePrototype()
-  const { equityUsd, availableMarginUsd, unrealizedPnlUsd, marginRatioPercent } =
-    contractPortfolioSummary
+  const { availableMarginUsd, unrealizedPnlUsd } = contractPortfolioSummary
   const isPositive = unrealizedPnlUsd >= 0
 
   return (
-    <section className="pb-4">
+    <>
       <div className="mb-4 grid grid-cols-2 gap-2">
-        <MetricCard
-          label="账户权益 (USD)"
-          value={`$${formatUsd(equityUsd)}`}
-          approxUsd={equityUsd}
-        />
         <MetricCard
           label="可用保证金"
           value={`$${formatUsd(availableMarginUsd)}`}
@@ -36,43 +25,9 @@ export function ContractAssetsPanel() {
           approxUsd={unrealizedPnlUsd}
           approxClassName={isPositive ? 'text-success' : 'text-danger'}
         />
-        <MetricCard
-          label="保证金率"
-          value={`${marginRatioPercent}%`}
-        />
       </div>
 
-      <div className="mb-4 flex gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            setProductModule('contract')
-            setActiveTab('trade')
-          }}
-          className="h-11 min-w-0 flex-1 rounded-md bg-brand text-body-sm font-semibold text-brand-dark active:bg-brand-hover"
-        >
-          交易
-        </button>
-        <button
-          type="button"
-          onClick={() => openWallet('transfer')}
-          className="h-11 min-w-0 flex-1 rounded-md border border-border text-body-sm font-medium text-primary active:bg-elevated"
-        >
-          划转
-        </button>
-      </div>
-
-      <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-body-sm font-medium text-secondary">当前持仓</h2>
-        <button
-          type="button"
-          aria-label="合约账单"
-          onClick={openContractHistory}
-          className="flex h-8 w-8 items-center justify-center text-secondary active:opacity-70"
-        >
-          <FileClock className="h-[18px] w-[18px]" strokeWidth={1.5} />
-        </button>
-      </div>
+      <h2 className="mb-3 text-body-sm font-medium text-secondary">当前持仓</h2>
 
       <div>
         {contractPositions.length === 0 ? (
@@ -87,7 +42,7 @@ export function ContractAssetsPanel() {
           ))
         )}
       </div>
-    </section>
+    </>
   )
 }
 

@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { AuthButton } from '../../components/auth/AuthButton'
 import { TextField } from '../../components/auth/TextField'
 import { usePrototype } from '../../context/PrototypeContext'
-import { accountCopy } from '../../data/account'
+import { accountCopy, securityVerifyScreen } from '../../data/account'
 import { isValidOtp } from '../../data/auth'
 import { SubPageLayout } from '../../components/account/SubPageLayout'
 
 export function SecurityGoogleVerifyPage() {
-  const { navigateAccount, updateProfile } = usePrototype()
+  const { navigateAccount, updateProfile, antiPhishingDraft, paymentPasswordDraft } =
+    usePrototype()
   const [phoneCode, setPhoneCode] = useState('')
   const [googleCode, setGoogleCode] = useState('')
   const [loading, setLoading] = useState(false)
@@ -25,6 +26,14 @@ export function SecurityGoogleVerifyPage() {
     window.setTimeout(() => {
       updateProfile({ googleAuthBound: true })
       setLoading(false)
+      if (antiPhishingDraft) {
+        navigateAccount(securityVerifyScreen('anti-phishing'))
+        return
+      }
+      if (paymentPasswordDraft) {
+        navigateAccount(securityVerifyScreen('payment-password'))
+        return
+      }
       navigateAccount({ screen: 'security' })
     }, 400)
   }

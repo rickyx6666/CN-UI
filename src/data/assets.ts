@@ -16,15 +16,35 @@ const walletUsdRate: Record<WalletCoin, number> = {
   TRX: 0.1106,
 }
 
-function fundingBalanceUsd(): number {
+export function fundingBalanceUsd(): number {
   return (Object.keys(fundingBalances) as WalletCoin[]).reduce(
     (sum, coin) => sum + fundingBalances[coin] * walletUsdRate[coin],
     0,
   )
 }
 
-function spotBalanceUsd(): number {
+export function spotBalanceUsd(): number {
   return coinBalances.reduce((sum, coin) => sum + coin.usdValue, 0)
+}
+
+export function getAccountBalanceUsd(accountId: AssetAccountId): number {
+  switch (accountId) {
+    case 'funding':
+      return fundingBalanceUsd()
+    case 'spot':
+      return spotBalanceUsd()
+    case 'contract':
+      return contractPortfolioSummary.equityUsd
+  }
+}
+
+export const assetAccountPnl: Record<
+  AssetAccountId,
+  { usd: number; percent: number }
+> = {
+  funding: { usd: 12.5, percent: 0.21 },
+  spot: { usd: 122.23, percent: 0.52 },
+  contract: { usd: -15.2, percent: -0.08 },
 }
 
 export const assetAccountSummaries: AssetAccountSummary[] = [

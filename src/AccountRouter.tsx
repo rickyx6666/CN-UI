@@ -9,6 +9,7 @@ import { KycPage } from './pages/account/KycPage'
 import { KycSumsubPage } from './pages/account/KycSumsubPage'
 import { LogoutPage } from './pages/account/LogoutPage'
 import { PaymentPasswordPage } from './pages/account/PaymentPasswordPage'
+import { AccountSecurityVerifyPage } from './pages/account/AccountSecurityVerifyPage'
 import { ProfilePage } from './pages/account/ProfilePage'
 import { SecurityEmailPage } from './pages/account/SecurityEmailPage'
 import { SecurityGoogleSetupPage } from './pages/account/SecurityGoogleSetupPage'
@@ -16,8 +17,9 @@ import { SecurityGooglePage } from './pages/account/SecurityGooglePage'
 import { SecurityGoogleVerifyPage } from './pages/account/SecurityGoogleVerifyPage'
 import { AntiPhishingFormPage } from './pages/account/AntiPhishingFormPage'
 import { AntiPhishingPage } from './pages/account/AntiPhishingPage'
-import { AntiPhishingVerifyPage } from './pages/account/AntiPhishingVerifyPage'
 import { SecuritySettingsPage } from './pages/account/SecuritySettingsPage'
+import { AboutPage } from './pages/account/AboutPage'
+import { AboutLegalPage } from './pages/account/AboutLegalPage'
 
 export function AccountRouter() {
   const { accountScreen } = usePrototype()
@@ -45,12 +47,12 @@ export function AccountRouter() {
       return <ChangeLoginPasswordPage />
     case 'security-payment-password':
       return <PaymentPasswordPage />
+    case 'security-verify':
+      return <AccountSecurityVerifyPage />
     case 'security-anti-phishing':
       return <AntiPhishingPage />
     case 'security-anti-phishing-form':
       return <AntiPhishingFormPage />
-    case 'security-anti-phishing-verify':
-      return <AntiPhishingVerifyPage />
     case 'kyc':
       return <KycPage />
     case 'kyc-sumsub':
@@ -63,6 +65,10 @@ export function AccountRouter() {
       return <DeleteAccountVerifyPage />
     case 'delete-success':
       return <DeleteAccountSuccessPage />
+    case 'about':
+      return <AboutPage />
+    case 'about-legal':
+      return <AboutLegalPage />
     default:
       return null
   }

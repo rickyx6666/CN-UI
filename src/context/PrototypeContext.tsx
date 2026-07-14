@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { AccountScreenState } from '../data/account'
+import { securityVerifyScreen } from '../data/account'
 import type { AntiPhishingDemoScene } from '../data/antiPhishing'
 import type { AuthScreenState } from '../data/auth'
 import { marketPairs } from '../data/mock'
@@ -112,6 +113,8 @@ interface PrototypeContextValue {
   withdrawDraft: WithdrawDraft | null
   antiPhishingDraft: string | null
   setAntiPhishingDraft: (code: string | null) => void
+  paymentPasswordDraft: string | null
+  setPaymentPasswordDraft: (pin: string | null) => void
   antiPhishingOverlay: 'how-it-works' | null
   clearAntiPhishingOverlay: () => void
   openAntiPhishingDemo: (scene: AntiPhishingDemoScene) => void
@@ -255,6 +258,9 @@ export function PrototypeProvider({
   )
   const [antiPhishingDraft, setAntiPhishingDraft] = useState<string | null>(
     preset?.antiPhishingDraft ?? null,
+  )
+  const [paymentPasswordDraft, setPaymentPasswordDraft] = useState<string | null>(
+    preset?.paymentPasswordDraft ?? null,
   )
   const [antiPhishingOverlay, setAntiPhishingOverlay] = useState<
     'how-it-works' | null
@@ -401,7 +407,7 @@ export function PrototypeProvider({
         case 'verify':
           setProfile((prev) => ({ ...prev, antiPhishingCode: '12NovaA' }))
           setAntiPhishingDraft('12NovaB')
-          setAccountScreen({ screen: 'security-anti-phishing-verify' })
+          setAccountScreen(securityVerifyScreen('anti-phishing'))
           break
       }
     },
@@ -775,6 +781,8 @@ export function PrototypeProvider({
       navigateWallet,
       setWithdrawDraft,
       setAntiPhishingDraft,
+      paymentPasswordDraft,
+      setPaymentPasswordDraft,
       activatedDepositKeys,
       isDepositActivated,
       activateDeposit,

@@ -114,6 +114,13 @@ export function AccountSettingsPage() {
                 onClick={() => navigateAccount({ screen: 'delete' })}
               />
             </SettingsGroup>
+
+            <SettingsGroup>
+              <SettingsRow
+                label="关于"
+                onClick={() => navigateAccount({ screen: 'about' })}
+              />
+            </SettingsGroup>
           </div>
         </div>
       ) : (
@@ -188,6 +195,13 @@ export function AccountSettingsPage() {
               danger
               showChevron
               onClick={() => navigateAccount({ screen: 'delete' })}
+            />
+          </SettingsGroup>
+
+          <SettingsGroup>
+            <SettingsRow
+              label="关于"
+              onClick={() => navigateAccount({ screen: 'about' })}
             />
           </SettingsGroup>
         </>

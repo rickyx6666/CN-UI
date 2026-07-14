@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { AuthButton } from '../../components/auth/AuthButton'
+import { AddVerificationMethodSheet } from '../../components/account/AddVerificationMethodSheet'
 import { AntiPhishingCodeRules } from '../../components/account/AntiPhishingCodeRules'
 import { SubPageLayout } from '../../components/account/SubPageLayout'
+import { securityVerifyScreen } from '../../data/account'
 import {
   antiPhishingCopy,
   isValidAntiPhishingCode,
@@ -9,11 +11,17 @@ import {
 import { usePrototype } from '../../context/PrototypeContext'
 
 export function AntiPhishingFormPage() {
-  const { accountScreen, navigateAccount, setAntiPhishingDraft } = usePrototype()
+  const {
+    accountScreen,
+    user,
+    navigateAccount,
+    setAntiPhishingDraft,
+  } = usePrototype()
   const mode = accountScreen?.antiPhishingMode ?? 'create'
   const isChange = mode === 'change'
   const [code, setCode] = useState('')
   const [error, setError] = useState<string>()
+  const [showVerificationSheet, setShowVerificationSheet] = useState(false)
 
   const title = isChange
     ? antiPhishingCopy.changeTitle
@@ -23,6 +31,11 @@ export function AntiPhishingFormPage() {
     navigateAccount({ screen: 'security-anti-phishing' })
   }
 
+  function proceedToVerify() {
+    setAntiPhishingDraft(code)
+    navigateAccount(securityVerifyScreen('anti-phishing'))
+  }
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!isValidAntiPhishingCode(code)) {
@@ -30,14 +43,29 @@ export function AntiPhishingFormPage() {
       return
     }
     setError(undefined)
+
+    if (!user.googleAuthBound) {
+      setShowVerificationSheet(true)
+      return
+    }
+
+    proceedToVerify()
+  }
+
+  function handleEnableVerification(method: 'passkey' | 'authenticator') {
+    setShowVerificationSheet(false)
     setAntiPhishingDraft(code)
-    navigateAccount({ screen: 'security-anti-phishing-verify' })
+
+    if (method === 'authenticator') {
+      navigateAccount({ screen: 'security-google-setup' })
+    }
   }
 
   const canSubmit = isValidAntiPhishingCode(code)
 
   return (
-    <SubPageLayout title={title} onBack={handleBack}>
+    <>
+      <SubPageLayout title={title} onBack={handleBack}>
       <p className="mb-5 text-body-sm text-secondary">
         {antiPhishingCopy.passwordNote}
       </p>
@@ -75,6 +103,14 @@ export function AntiPhishingFormPage() {
           </AuthButton>
         </div>
       </form>
-    </SubPageLayout>
+      </SubPageLayout>
+
+      <AddVerificationMethodSheet
+        open={showVerificationSheet}
+        onClose={() => setShowVerificationSheet(false)}
+        onEnable={handleEnableVerification}
+        defaultMethod="authenticator"
+      />
+    </>
   )
 }

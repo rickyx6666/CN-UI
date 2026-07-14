@@ -1,3 +1,8 @@
+import { antiPhishingCopy } from './antiPhishing'
+import type { UserProfile } from './mock'
+
+export type SecurityVerifyPurpose = 'payment-password' | 'anti-phishing'
+
 export type AccountScreenName =
   | 'hub'
   | 'invite'
@@ -9,19 +14,23 @@ export type AccountScreenName =
   | 'security-email'
   | 'security-login-password'
   | 'security-payment-password'
+  | 'security-verify'
   | 'security-anti-phishing'
   | 'security-anti-phishing-form'
-  | 'security-anti-phishing-verify'
   | 'kyc'
   | 'kyc-sumsub'
   | 'logout'
   | 'delete'
   | 'delete-verify'
   | 'delete-success'
+  | 'about'
+  | 'about-legal'
 
 export interface AccountScreenState {
   screen: AccountScreenName
   antiPhishingMode?: 'create' | 'change'
+  legalId?: string
+  securityVerifyPurpose?: SecurityVerifyPurpose
 }
 
 export interface SecurityItem {
@@ -50,7 +59,38 @@ export const accountCopy = {
   deleteTitle: '注销账户',
   deleteVerifyTitle: '安全验证',
   deleteSuccessTitle: '账户已注销',
+  aboutTitle: '关于',
+  securityVerifyTitle: '安全验证',
 } as const
+
+export function getSecurityVerifyMeta(
+  purpose: SecurityVerifyPurpose,
+  user: UserProfile,
+) {
+  if (purpose === 'payment-password') {
+    const action = user.paymentPasswordSet ? '修改' : '设置'
+    return {
+      hint: `请输入验证器 App 生成的 6 位数验证码，以${action}支付密码。`,
+      submitLabel: user.paymentPasswordSet ? '确认修改' : '确认设置',
+      backScreen: () => ({ screen: 'security-payment-password' as const }),
+    }
+  }
+
+  return {
+    hint: antiPhishingCopy.verifyHint,
+    submitLabel: antiPhishingCopy.submitButton,
+    backScreen: () => ({
+      screen: 'security-anti-phishing-form' as const,
+      antiPhishingMode: user.antiPhishingCode ? ('change' as const) : ('create' as const),
+    }),
+  }
+}
+
+export function securityVerifyScreen(
+  purpose: SecurityVerifyPurpose,
+): AccountScreenState {
+  return { screen: 'security-verify', securityVerifyPurpose: purpose }
+}
 
 export const kycProviderCopy = {
   name: 'Sumsub',

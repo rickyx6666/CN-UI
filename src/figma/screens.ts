@@ -361,6 +361,20 @@ const accountScreens: MobileScreenDef[] = [
     }),
   },
   {
+    path: 'account/security-verify-payment-password',
+    label: '安全验证 · 支付密码',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: {
+        screen: 'security-verify',
+        securityVerifyPurpose: 'payment-password',
+      },
+      paymentPasswordDraft: '123456',
+    }),
+  },
+  {
     path: 'account/security-anti-phishing',
     label: '防钓鱼码 · 介绍',
     description: '未设置时展示说明与创建入口',
@@ -407,6 +421,7 @@ const accountScreens: MobileScreenDef[] = [
         screen: 'security-anti-phishing-form',
         antiPhishingMode: 'create',
       },
+      userGoogleAuthBound: false,
     }),
   },
   {
@@ -424,14 +439,18 @@ const accountScreens: MobileScreenDef[] = [
     }),
   },
   {
-    path: 'account/security-anti-phishing-verify',
-    label: '防钓鱼码 · 安全验证',
+    path: 'account/security-verify-anti-phishing',
+    label: '安全验证 · 防钓鱼码',
     group: 'account',
     preset: app({
       isLoggedIn: true,
       activeTab: 'market',
-      accountScreen: { screen: 'security-anti-phishing-verify' },
+      accountScreen: {
+        screen: 'security-verify',
+        securityVerifyPurpose: 'anti-phishing',
+      },
       antiPhishingDraft: '12NovaA',
+      userAntiPhishingCode: '12NovaA',
     }),
   },
   {
@@ -515,6 +534,36 @@ const accountScreens: MobileScreenDef[] = [
       isLoggedIn: true,
       activeTab: 'market',
       accountScreen: { screen: 'delete-success' },
+    }),
+  },
+  {
+    path: 'account/about',
+    label: '关于',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'about' },
+    }),
+  },
+  {
+    path: 'account/about-agreement',
+    label: '用户协议',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'about-legal', legalId: 'agreement' },
+    }),
+  },
+  {
+    path: 'account/about-privacy',
+    label: '隐私协议',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      accountScreen: { screen: 'about-legal', legalId: 'privacy' },
     }),
   },
 ]
@@ -683,6 +732,26 @@ const recordsScreens: MobileScreenDef[] = [
       activeTab: 'trade',
       recordsScreen: { screen: 'order-detail', orderId: 'ord-pop-1' },
       orders: mockSpotOrders,
+    }),
+  },
+  {
+    path: 'records/contract-order-detail-filled',
+    label: '合约委托详情 · 全部成交',
+    group: 'records',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'trade',
+      recordsScreen: { screen: 'contract-order-detail', orderId: 'hist-5' },
+    }),
+  },
+  {
+    path: 'records/contract-order-detail-cancelled',
+    label: '合约委托详情 · 已取消',
+    group: 'records',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'trade',
+      recordsScreen: { screen: 'contract-order-detail', orderId: 'hist-4' },
     }),
   },
 ]

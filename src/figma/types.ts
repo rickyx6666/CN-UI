@@ -57,6 +57,7 @@ export interface PrototypePreset {
   userAntiPhishingCode?: string | null
   /** Figma 导出：防钓鱼码创建/更改流程草稿 */
   antiPhishingDraft?: string | null
+  paymentPasswordDraft?: string | null
   /** Figma 导出：防钓鱼码页叠加层 */
   antiPhishingOverlay?: 'how-it-works'
   /** Figma 导出页：禁用自动跳转等原型行为 */

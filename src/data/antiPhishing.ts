@@ -15,6 +15,13 @@ export const antiPhishingCopy = {
   createButton: '建立',
   changeButton: '更改防钓鱼码',
   submitButton: '提交',
+  addVerificationTitle: '需添加其他验证方式',
+  addVerificationDesc: '为确保您的账户安全，您需要再添加至少1种验证方式。',
+  passkeyLabel: '通行密钥',
+  passkeyHint: '通过生物识别或安全密钥验证',
+  authenticatorLabel: '身份验证器App',
+  recommended: '推荐',
+  enableButton: '启用',
 } as const
 
 export const antiPhishingRules = [

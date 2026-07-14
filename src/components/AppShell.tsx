@@ -3,6 +3,7 @@ import { usePrototype } from '../context/PrototypeContext'
 import { useFigmaPcDocument } from '../hooks/useFigmaPcDocument'
 import { AppToast } from './feedback/AppToast'
 import { BottomTabBar } from './BottomTabBar'
+import { ContractOrderEditProvider, ContractOrderEditSheetHost } from './contract/ContractOrderEditContext'
 
 interface AppShellProps {
   children: ReactNode
@@ -32,20 +33,23 @@ export function AppShell({ children }: AppShellProps) {
     !recordsScreen
 
   return (
-    <div
-      className={`relative flex flex-col ${
-        pcDocument ? 'min-h-full' : 'h-full overflow-hidden'
-      }`}
-    >
+    <ContractOrderEditProvider>
       <div
-        className={`relative ${
-          pcDocument ? '' : 'min-h-0 flex-1 overflow-hidden'
+        className={`relative flex flex-col ${
+          pcDocument ? 'min-h-full' : 'h-full overflow-hidden'
         }`}
       >
-        {children}
+        <div
+          className={`relative ${
+            pcDocument ? '' : 'min-h-0 flex-1 overflow-hidden'
+          }`}
+        >
+          {children}
+          <ContractOrderEditSheetHost />
+        </div>
+        {showTabBar && <BottomTabBar />}
+        <AppToast />
       </div>
-      {showTabBar && <BottomTabBar />}
-      <AppToast />
-    </div>
+    </ContractOrderEditProvider>
   )
 }

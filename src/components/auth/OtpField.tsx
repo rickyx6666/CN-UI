@@ -5,9 +5,20 @@ interface OtpFieldProps {
   value: string
   onChange: (value: string) => void
   error?: string
+  masked?: boolean
+  autoComplete?: string
+  ariaLabel?: string
 }
 
-export function OtpField({ label, value, onChange, error }: OtpFieldProps) {
+export function OtpField({
+  label,
+  value,
+  onChange,
+  error,
+  masked = false,
+  autoComplete = 'one-time-code',
+  ariaLabel = '输入 6 位验证码',
+}: OtpFieldProps) {
   const id = useId()
   const inputRef = useRef<HTMLInputElement>(null)
 
@@ -23,7 +34,7 @@ export function OtpField({ label, value, onChange, error }: OtpFieldProps) {
         id={id}
         type="text"
         inputMode="numeric"
-        autoComplete="one-time-code"
+        autoComplete={autoComplete}
         maxLength={6}
         value={value}
         onChange={(e) => onChange(e.target.value.replace(/\D/g, '').slice(0, 6))}
@@ -33,7 +44,7 @@ export function OtpField({ label, value, onChange, error }: OtpFieldProps) {
         type="button"
         onClick={() => inputRef.current?.focus()}
         className="flex w-full justify-between gap-2"
-        aria-label="输入 6 位验证码"
+        aria-label={ariaLabel}
       >
         {digits.map((digit, i) => (
           <span
@@ -42,7 +53,7 @@ export function OtpField({ label, value, onChange, error }: OtpFieldProps) {
               error ? 'border-danger' : 'border-border'
             }`}
           >
-            {digit.trim() || ''}
+            {digit.trim() ? (masked ? '•' : digit) : ''}
           </span>
         ))}
       </button>

@@ -5,7 +5,7 @@ import { useFigmaPcDocument } from '../../hooks/useFigmaPcDocument'
 import { PcTopBar } from '../pc/PcTopBar'
 
 interface SubPageLayoutProps {
-  title: string
+  title: ReactNode
   onBack?: () => void
   hideBack?: boolean
   headerRight?: ReactNode

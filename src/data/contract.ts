@@ -10,6 +10,7 @@ export type ContractOrderKind =
   | 'market'
   | 'conditional'
   | 'post-only'
+  | 'trailing'
 
 export interface ContractPortfolioSummary {
   equityUsd: number
@@ -48,6 +49,12 @@ export const contractOrderKinds: { id: ContractOrderKind; label: string }[] = [
   { id: 'market', label: '市价单' },
   { id: 'conditional', label: '条件委托' },
   { id: 'post-only', label: '只做 Maker' },
+]
+
+export const contractCloseOrderKinds: { id: ContractOrderKind; label: string }[] = [
+  { id: 'limit', label: '限价单' },
+  { id: 'market', label: '市价单' },
+  { id: 'trailing', label: '跟踪委托' },
 ]
 
 export const contractLeverageOptions = [5, 10, 19, 20, 50] as const
@@ -149,6 +156,13 @@ export function contractMarginModeLabel(mode: ContractMarginMode): string {
   return mode === 'cross' ? '全仓' : '逐仓'
 }
 
+/** 保证金率：<60% 绿，>60% 黄，>80% 红 */
+export function contractMarginRatioClass(percent: number): string {
+  if (percent > 80) return 'text-danger'
+  if (percent > 60) return 'text-warning'
+  return 'text-success'
+}
+
 export type ContractOrderCategory = 'basic' | 'conditional'
 export type ContractOrderIntent = 'open' | 'close'
 export type ContractTpSlType = 'take-profit' | 'stop-loss'
@@ -174,8 +188,10 @@ export interface ContractTpSlOrder {
   side: 'long' | 'short'
   tpSlType: ContractTpSlType
   triggerPrice: number
+  triggerComparator: 'lte' | 'gte'
   orderPrice: number | null
   size: number
+  reduceOnly: boolean
   createdAt: number
 }
 
@@ -202,9 +218,11 @@ export const contractOpenOrders: ContractOpenOrder[] = [
     side: 'long',
     tpSlType: 'take-profit',
     triggerPrice: 2_246,
+    triggerComparator: 'gte',
     orderPrice: 2_246,
     size: 4.6,
-    createdAt: new Date('2026-06-04T10:20:00').getTime(),
+    reduceOnly: true,
+    createdAt: new Date('2026-06-05T09:12:08').getTime(),
   },
   {
     id: 'ctpsl-2',
@@ -213,9 +231,11 @@ export const contractOpenOrders: ContractOpenOrder[] = [
     side: 'long',
     tpSlType: 'stop-loss',
     triggerPrice: 1_364,
+    triggerComparator: 'lte',
     orderPrice: null,
     size: 4.6,
-    createdAt: new Date('2026-06-03T08:15:00').getTime(),
+    reduceOnly: true,
+    createdAt: new Date('2026-06-06T13:33:17').getTime(),
   },
 ]
 
@@ -233,9 +253,29 @@ export function contractOrderSideLabel(order: ContractBasicOrder): string {
 }
 
 export function contractTpSlLabel(order: ContractTpSlOrder): string {
-  const typeLabel = order.tpSlType === 'take-profit' ? '止盈' : '止损'
+  const isMarket = order.orderPrice == null
+  const typeLabel =
+    order.tpSlType === 'take-profit'
+      ? isMarket
+        ? '市价止盈'
+        : '限价止盈'
+      : isMarket
+        ? '市价止损'
+        : '限价止损'
   const actionLabel = order.side === 'long' ? '平多' : '平空'
   return `${typeLabel} / ${actionLabel}`
+}
+
+export function contractTpSlTriggerLabel(order: ContractTpSlOrder): string {
+  const symbol = order.triggerComparator === 'lte' ? '≤' : '≥'
+  return `标记价格${symbol}${formatContractPrice(order.triggerPrice)}`
+}
+
+function formatContractPrice(value: number): string {
+  return value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
 }
 
 export function contractOrderSideTone(
@@ -249,4 +289,34 @@ export function contractOrderSideTone(
 
 export function contractTpSlTone(order: ContractTpSlOrder): 'success' | 'danger' {
   return order.tpSlType === 'take-profit' ? 'success' : 'danger'
+}
+
+export function contractClosableSize(
+  symbol: string,
+  side: 'long' | 'short',
+): number {
+  return contractPositions
+    .filter((position) => position.symbol === symbol && position.side === side)
+    .reduce((total, position) => total + position.size, 0)
+}
+
+export function contractPositionEntryPrice(
+  symbol: string,
+  side: 'long' | 'short',
+): number | null {
+  const position = contractPositions.find(
+    (item) => item.symbol === symbol && item.side === side,
+  )
+  return position?.entryPrice ?? null
+}
+
+export function contractEstimatedClosePnl(
+  entryPrice: number,
+  triggerPrice: number,
+  size: number,
+  side: 'long' | 'short',
+): number {
+  const diff =
+    side === 'long' ? triggerPrice - entryPrice : entryPrice - triggerPrice
+  return diff * size
 }

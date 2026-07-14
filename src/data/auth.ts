@@ -44,6 +44,10 @@ export function isValidOtp(value: string): boolean {
   return /^\d{6}$/.test(value)
 }
 
+export function isValidPaymentPin(value: string): boolean {
+  return isValidOtp(value)
+}
+
 export const authCopy = {
   accountLabel: '邮箱/手机号',
   accountPlaceholder: '请输入邮箱或手机号',

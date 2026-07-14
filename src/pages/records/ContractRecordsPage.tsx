@@ -1,6 +1,12 @@
 import { useMemo, useState } from 'react'
-import { ChevronDown, CircleHelp, PackageOpen } from 'lucide-react'
+import { ChevronDown, CircleHelp, Filter, PackageOpen } from 'lucide-react'
+import { ContractFillRecordCard } from '../../components/contract/ContractFillRecordCard'
+import { ContractFundFlowCard } from '../../components/contract/ContractFundFlowCard'
+import { ContractFundingFeeCard } from '../../components/contract/ContractFundingFeeCard'
+import { ContractHistoryOrderCard } from '../../components/contract/ContractHistoryOrderCard'
 import { ContractOpenOrderCard } from '../../components/contract/ContractOpenOrderCard'
+import { useContractOrderEdit } from '../../components/contract/ContractOrderEditContext'
+import { ContractPositionHistoryCard } from '../../components/contract/ContractPositionHistoryCard'
 import { ContractTpSlOrderCard } from '../../components/contract/ContractTpSlOrderCard'
 import { SubPageLayout } from '../../components/account/SubPageLayout'
 import {
@@ -8,6 +14,15 @@ import {
   contractOpenOrders,
   type ContractOrderCategory,
 } from '../../data/contract'
+import {
+  contractFillRecords,
+  contractFundFlowRecords,
+  contractFundingFeeRecords,
+  contractHistoryOrders,
+  contractPositionHistory,
+  contractPositionHistoryUpdatedAt,
+  formatContractRecordTime,
+} from '../../data/contractRecords'
 import { recordsCopy } from '../../data/records'
 import { usePrototype } from '../../context/PrototypeContext'
 
@@ -17,7 +32,7 @@ type RecordTab =
   | 'positions'
   | 'fills'
   | 'fund'
-  | 'assets'
+  | 'funding'
 
 const mainTabs: { id: RecordTab; label: string }[] = [
   { id: 'open', label: `当前委托(${contractOpenOrderCount})` },
@@ -25,11 +40,12 @@ const mainTabs: { id: RecordTab; label: string }[] = [
   { id: 'positions', label: '仓位历史' },
   { id: 'fills', label: '历史成交' },
   { id: 'fund', label: '资金流水' },
-  { id: 'assets', label: '资产' },
+  { id: 'funding', label: '资金费用' },
 ]
 
 export function ContractRecordsPage() {
-  const { closeRecords } = usePrototype()
+  const { closeRecords, navigateRecords } = usePrototype()
+  const { openContractOrderEdit } = useContractOrderEdit()
   const [tab, setTab] = useState<RecordTab>('open')
   const [subTab, setSubTab] = useState<ContractOrderCategory>('basic')
   const [orders, setOrders] = useState(contractOpenOrders)
@@ -42,6 +58,11 @@ export function ContractRecordsPage() {
     return orders.filter((order) => order.category === subTab)
   }, [orders, subTab, tab])
 
+  const visibleHistoryOrders = useMemo(() => {
+    if (tab !== 'history') return []
+    return contractHistoryOrders.filter((order) => order.category === subTab)
+  }, [subTab, tab])
+
   const cancelOrder = (orderId: string) => {
     setOrders((prev) => prev.filter((order) => order.id !== orderId))
   }
@@ -49,6 +70,34 @@ export function ContractRecordsPage() {
   const cancelAll = () => {
     setOrders((prev) => prev.filter((order) => order.category !== subTab))
   }
+
+  const confirmBasicEdit = (
+    orderId: string,
+    values: { price: number; size: number },
+  ) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.id === orderId && order.category === 'basic'
+          ? { ...order, price: values.price, size: values.size }
+          : order,
+      ),
+    )
+  }
+
+  const confirmConditionalEdit = (
+    orderId: string,
+    values: { triggerPrice: number },
+  ) => {
+    setOrders((prev) =>
+      prev.map((order) =>
+        order.id === orderId && order.category === 'conditional'
+          ? { ...order, triggerPrice: values.triggerPrice }
+          : order,
+      ),
+    )
+  }
+
+  const showOrderSubTabs = tab === 'open' || tab === 'history'
 
   return (
     <div className="relative h-full min-h-0">
@@ -77,30 +126,38 @@ export function ContractRecordsPage() {
           </div>
         </div>
 
+        {showOrderSubTabs && (
+          <div className="mb-3 flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <SubTabChip
+                label={
+                  tab === 'open' ? `基础单(${basicCount})` : '基础单'
+                }
+                active={subTab === 'basic'}
+                onClick={() => setSubTab('basic')}
+              />
+              <SubTabChip
+                label={
+                  tab === 'open'
+                    ? `条件委托(${conditionalCount})`
+                    : '条件委托'
+                }
+                active={subTab === 'conditional'}
+                onClick={() => setSubTab('conditional')}
+              />
+            </div>
+            <button
+              type="button"
+              aria-label="说明"
+              className="flex h-7 w-7 shrink-0 items-center justify-center text-secondary active:opacity-70"
+            >
+              <CircleHelp className="h-4 w-4" strokeWidth={1.5} />
+            </button>
+          </div>
+        )}
+
         {tab === 'open' && (
           <>
-            <div className="mb-3 flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <SubTabChip
-                  label={`基础单(${basicCount})`}
-                  active={subTab === 'basic'}
-                  onClick={() => setSubTab('basic')}
-                />
-                <SubTabChip
-                  label={`条件委托(${conditionalCount})`}
-                  active={subTab === 'conditional'}
-                  onClick={() => setSubTab('conditional')}
-                />
-              </div>
-              <button
-                type="button"
-                aria-label="说明"
-                className="flex h-7 w-7 shrink-0 items-center justify-center text-secondary active:opacity-70"
-              >
-                <CircleHelp className="h-4 w-4" strokeWidth={1.5} />
-              </button>
-            </div>
-
             <div className="mb-3 flex items-center gap-2">
               <FilterChip label="合约" />
               <FilterChip label="订单类型" />
@@ -125,12 +182,30 @@ export function ContractRecordsPage() {
                       key={order.id}
                       order={order}
                       onCancel={() => cancelOrder(order.id)}
+                      onEdit={() =>
+                        openContractOrderEdit(
+                          { kind: 'conditional', order },
+                          {
+                            onConfirmBasic: confirmBasicEdit,
+                            onConfirmConditional: confirmConditionalEdit,
+                          },
+                        )
+                      }
                     />
                   ) : (
                     <ContractOpenOrderCard
                       key={order.id}
                       order={order}
                       onCancel={() => cancelOrder(order.id)}
+                      onEdit={() =>
+                        openContractOrderEdit(
+                          { kind: 'basic', order },
+                          {
+                            onConfirmBasic: confirmBasicEdit,
+                            onConfirmConditional: confirmConditionalEdit,
+                          },
+                        )
+                      }
                     />
                   ),
                 )}
@@ -139,7 +214,161 @@ export function ContractRecordsPage() {
           </>
         )}
 
-        {tab !== 'open' && <EmptyState />}
+        {tab === 'history' && (
+          <>
+            <div className="mb-3 flex items-center gap-2 overflow-x-auto scrollbar-none">
+              <FilterChip label="合约" />
+              <FilterChip label="订单类型" />
+              <FilterChip label="方向" />
+              <FilterChip label="状态" />
+              <button
+                type="button"
+                aria-label="筛选"
+                className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center text-brand active:opacity-70"
+              >
+                <Filter className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {visibleHistoryOrders.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div>
+                {visibleHistoryOrders.map((order) => (
+                  <ContractHistoryOrderCard
+                    key={order.id}
+                    order={order}
+                    onOpenDetail={() =>
+                      navigateRecords({
+                        screen: 'contract-order-detail',
+                        orderId: order.id,
+                      })
+                    }
+                  />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {tab === 'positions' && (
+          <>
+            <div className="mb-3 flex items-center gap-2 overflow-x-auto scrollbar-none">
+              <FilterChip label="合约" />
+              <FilterChip label="仓位模式" />
+              <FilterChip label="状态" />
+              <button
+                type="button"
+                aria-label="筛选"
+                className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center text-brand active:opacity-70"
+              >
+                <Filter className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            <p className="mb-3 text-[10px] leading-relaxed text-secondary">
+              更新时间 {formatContractRecordTime(contractPositionHistoryUpdatedAt)}
+              <br />
+              数据可能存在延迟，仅供参考
+            </p>
+
+            {contractPositionHistory.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <>
+                <div>
+                  {contractPositionHistory.map((position) => (
+                    <ContractPositionHistoryCard
+                      key={position.id}
+                      position={position}
+                    />
+                  ))}
+                </div>
+                <p className="py-6 text-center text-caption text-secondary">
+                  已经全部加载完毕
+                </p>
+              </>
+            )}
+          </>
+        )}
+
+        {tab === 'fills' && (
+          <>
+            <div className="mb-3 flex items-center gap-2">
+              <FilterChip label="合约" />
+              <FilterChip label="方向" />
+              <button
+                type="button"
+                aria-label="筛选"
+                className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center text-brand active:opacity-70"
+              >
+                <Filter className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {contractFillRecords.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div>
+                {contractFillRecords.map((fill) => (
+                  <ContractFillRecordCard key={fill.id} fill={fill} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {tab === 'fund' && (
+          <>
+            <div className="mb-3 flex items-center gap-2">
+              <FilterChip label="类型" />
+              <FilterChip label="时间" />
+              <button
+                type="button"
+                aria-label="筛选"
+                className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center text-brand active:opacity-70"
+              >
+                <Filter className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {contractFundFlowRecords.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div>
+                {contractFundFlowRecords.map((record) => (
+                  <ContractFundFlowCard key={record.id} record={record} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {tab === 'funding' && (
+          <>
+            <div className="mb-3 flex items-center gap-2">
+              <FilterChip label="合约" />
+              <FilterChip label="方向" />
+              <button
+                type="button"
+                aria-label="筛选"
+                className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center text-brand active:opacity-70"
+              >
+                <Filter className="h-4 w-4" strokeWidth={1.5} />
+              </button>
+            </div>
+
+            {contractFundingFeeRecords.length === 0 ? (
+              <EmptyState />
+            ) : (
+              <div>
+                {contractFundingFeeRecords.map((record) => (
+                  <ContractFundingFeeCard key={record.id} record={record} />
+                ))}
+              </div>
+            )}
+          </>
+        )}
       </SubPageLayout>
     </div>
   )

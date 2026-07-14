@@ -1,7 +1,7 @@
 import { Copy, Plus, X } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import type { AccountScreenState } from '../../data/account'
-import { accountCopy } from '../../data/account'
+import { securityVerifyScreen } from '../../data/account'
 import { isValidOtp } from '../../data/auth'
 import { usePrototype } from '../../context/PrototypeContext'
 import { AuthButton } from '../auth/AuthButton'
@@ -20,7 +20,8 @@ interface PcGoogleAuthModalProps {
 }
 
 export function PcGoogleAuthModal({ screen, onClose, onNavigate }: PcGoogleAuthModalProps) {
-  const { user, updateProfile, figmaExport } = usePrototype()
+  const { user, updateProfile, figmaExport, antiPhishingDraft, paymentPasswordDraft } =
+    usePrototype()
 
   if (screen === 'security-google-setup') {
     return (
@@ -43,6 +44,14 @@ export function PcGoogleAuthModal({ screen, onClose, onNavigate }: PcGoogleAuthM
         onClose={() => onNavigate({ screen: 'security-google-setup' })}
         onSuccess={() => {
           updateProfile({ googleAuthBound: true })
+          if (antiPhishingDraft) {
+            onNavigate(securityVerifyScreen('anti-phishing'))
+            return
+          }
+          if (paymentPasswordDraft) {
+            onNavigate(securityVerifyScreen('payment-password'))
+            return
+          }
           onClose()
         }}
       />

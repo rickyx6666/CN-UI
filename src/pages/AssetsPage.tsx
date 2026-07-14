@@ -6,14 +6,21 @@ import { formatUsd } from '../data/mock'
 import {
   approximateCny,
   assetAccountLabels,
+  assetAccountPnl,
   assetAccountSummaries,
+  getAccountBalanceUsd,
   type AssetAccountId,
 } from '../data/assets'
 import { AppLayout } from '../components/AppLayout'
 import { BalanceHero } from '../components/BalanceHero'
+import { AccountBalanceSummary } from '../components/assets/AccountBalanceSummary'
 import { FundingAssetsPanel } from '../components/assets/FundingAssetsPanel'
 import { SpotAssetsPanel } from '../components/assets/SpotAssetsPanel'
 import { ContractAssetsPanel } from '../components/contract/ContractAssetsPanel'
+import type { AccountBalanceAction } from '../components/assets/AccountBalanceSummary'
+import type { BottomTabId } from '../data/mock'
+import type { ProductModule } from '../data/productModule'
+import type { WalletCoin } from '../data/wallet'
 
 export function AssetsPage() {
   const {
@@ -22,7 +29,10 @@ export function AssetsPage() {
     openWallet,
     openFundHistory,
     openOrderHistory,
+    openContractHistory,
     navigateAccount,
+    setActiveTab,
+    setProductModule,
   } = usePrototype()
   const autoOpened = useRef(false)
   const [activeAccount, setActiveAccount] = useState<AssetAccountId | null>(
@@ -42,17 +52,16 @@ export function AssetsPage() {
 
   if (activeAccount) {
     return (
-      <AppLayout>
-        <AccountDetailHeader
-          title={assetAccountLabels[activeAccount]}
-          onBack={() => setActiveAccount(null)}
-        />
-        <section className="layout-screen-x pb-4">
-          {activeAccount === 'funding' && <FundingAssetsPanel />}
-          {activeAccount === 'spot' && <SpotAssetsPanel />}
-          {activeAccount === 'contract' && <ContractAssetsPanel />}
-        </section>
-      </AppLayout>
+      <AccountDetailView
+        accountId={activeAccount}
+        onBack={() => setActiveAccount(null)}
+        openWallet={openWallet}
+        openFundHistory={openFundHistory}
+        openOrderHistory={openOrderHistory}
+        openContractHistory={openContractHistory}
+        setActiveTab={setActiveTab}
+        setProductModule={setProductModule}
+      />
     )
   }
 
@@ -123,6 +132,101 @@ export function AssetsPage() {
             </li>
           ))}
         </ul>
+      </section>
+    </AppLayout>
+  )
+}
+
+function AccountDetailView({
+  accountId,
+  onBack,
+  openWallet,
+  openFundHistory,
+  openOrderHistory,
+  openContractHistory,
+  setActiveTab,
+  setProductModule,
+}: {
+  accountId: AssetAccountId
+  onBack: () => void
+  openWallet: (
+    flow: 'deposit' | 'withdraw' | 'transfer',
+    options?: { coin?: WalletCoin },
+  ) => void
+  openFundHistory: () => void
+  openOrderHistory: () => void
+  openContractHistory: () => void
+  setActiveTab: (tab: BottomTabId) => void
+  setProductModule: (module: ProductModule) => void
+}) {
+  const balanceLabel = accountId === 'contract' ? '保证金余额' : '预估总资产'
+  const pnl = assetAccountPnl[accountId]
+
+  const actions: AccountBalanceAction[] =
+    accountId === 'contract'
+      ? [
+          {
+            label: '交易',
+            variant: 'primary',
+            onClick: () => {
+              setProductModule('contract')
+              setActiveTab('trade')
+            },
+          },
+          {
+            label: '划转',
+            variant: 'secondary',
+            onClick: () => openWallet('transfer'),
+          },
+        ]
+      : [
+          {
+            label: '充值',
+            variant: 'primary',
+            onClick: () => openWallet('deposit'),
+          },
+          {
+            label: '提现',
+            variant: 'secondary',
+            onClick: () => openWallet('withdraw'),
+          },
+          {
+            label: '划转',
+            variant: 'secondary',
+            onClick: () => openWallet('transfer'),
+          },
+        ]
+
+  const handleHistoryClick = () => {
+    if (accountId === 'funding') {
+      openFundHistory()
+      return
+    }
+    if (accountId === 'spot') {
+      openOrderHistory()
+      return
+    }
+    openContractHistory()
+  }
+
+  return (
+    <AppLayout>
+      <AccountDetailHeader
+        title={assetAccountLabels[accountId]}
+        onBack={onBack}
+      />
+      <section className="layout-screen-x pb-4">
+        <AccountBalanceSummary
+          label={balanceLabel}
+          balanceUsd={getAccountBalanceUsd(accountId)}
+          pnlUsd={pnl.usd}
+          pnlPercent={pnl.percent}
+          actions={actions}
+          onHistoryClick={handleHistoryClick}
+        />
+        {accountId === 'funding' && <FundingAssetsPanel />}
+        {accountId === 'spot' && <SpotAssetsPanel />}
+        {accountId === 'contract' && <ContractAssetsPanel />}
       </section>
     </AppLayout>
   )
