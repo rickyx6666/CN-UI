@@ -4,6 +4,7 @@ import { contractMarginModeLabel, contractMarginRatioClass } from '../../data/co
 import { contractShareFromOpen } from '../../data/contractShare'
 import { formatUsd } from '../../data/mock'
 import { useContractPositionShare } from './ContractPositionShareContext'
+import { useContractPositionAction } from './ContractPositionActionContext'
 
 interface ContractPositionCardProps {
   position: ContractPosition
@@ -15,6 +16,7 @@ export function ContractPositionCard({
   readOnly = false,
 }: ContractPositionCardProps) {
   const { openContractPositionShare } = useContractPositionShare()
+  const { openContractPositionAction } = useContractPositionAction()
   const isLong = position.side === 'long'
   const positive = position.pnlUsd >= 0
 
@@ -107,6 +109,7 @@ export function ContractPositionCard({
             <button
               type="button"
               aria-label="编辑止盈止损"
+              onClick={() => openContractPositionAction(position, 'tpsl')}
               className="flex h-4 w-4 shrink-0 items-center justify-center text-secondary active:opacity-70"
             >
               <Pencil className="h-3 w-3" strokeWidth={1.5} />
@@ -117,13 +120,20 @@ export function ContractPositionCard({
 
       {!readOnly && (
         <div className="grid grid-cols-3 gap-2">
-          {['杠杆', '止盈/止损', '平仓'].map((label) => (
+          {(
+            [
+              { label: '杠杆', action: 'leverage' as const },
+              { label: '止盈/止损', action: 'tpsl' as const },
+              { label: '平仓', action: 'close' as const },
+            ] as const
+          ).map((item) => (
             <button
-              key={label}
+              key={item.label}
               type="button"
+              onClick={() => openContractPositionAction(position, item.action)}
               className="rounded-md bg-sunken py-2 text-[10px] font-medium text-primary active:opacity-80"
             >
-              {label}
+              {item.label}
             </button>
           ))}
         </div>
