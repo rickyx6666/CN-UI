@@ -51,6 +51,8 @@ export interface UserProfile {
   bio: string
   kycStatus: KycStatus
   googleAuthBound: boolean
+  phone: string
+  phoneBound: boolean
   paymentPasswordSet: boolean
   antiPhishingCode: string | null
 }

@@ -70,14 +70,14 @@ export function getSecurityVerifyMeta(
   if (purpose === 'payment-password') {
     const action = user.paymentPasswordSet ? '修改' : '设置'
     return {
-      hint: `请输入验证器 App 生成的 6 位数验证码，以${action}支付密码。`,
+      hint: `请完成身份验证器与邮箱验证，以${action}支付密码。`,
       submitLabel: user.paymentPasswordSet ? '确认修改' : '确认设置',
       backScreen: () => ({ screen: 'security-payment-password' as const }),
     }
   }
 
   return {
-    hint: antiPhishingCopy.verifyHint,
+    hint: '请完成身份验证器与邮箱验证后继续设置防钓鱼码。',
     submitLabel: antiPhishingCopy.submitButton,
     backScreen: () => ({
       screen: 'security-anti-phishing-form' as const,

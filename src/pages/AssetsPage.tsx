@@ -17,6 +17,7 @@ import { AssetAccountTabs } from '../components/assets/AssetAccountTabs'
 import { FundingAssetsPanel } from '../components/assets/FundingAssetsPanel'
 import { SpotAssetsPanel } from '../components/assets/SpotAssetsPanel'
 import { ContractAssetsPanel } from '../components/contract/ContractAssetsPanel'
+import { ContractMarginBalanceInfoSheet } from '../components/contract/ContractMarginBalanceInfoSheet'
 import { AssetHistoryPickerSheet } from '../components/assets/AssetHistoryPickerSheet'
 import type { AssetCoinAccountType } from '../data/assetCoinDetail'
 import { FundingCoinDetailPage } from './assets/FundingCoinDetailPage'
@@ -44,6 +45,7 @@ export function AssetsPage() {
   const [activeTab, setActivePageTab] = useState<AssetPageTabId>('overview')
   const [coinDetail, setCoinDetail] = useState<AssetCoinDetailState | null>(null)
   const [historyPickerOpen, setHistoryPickerOpen] = useState(false)
+  const [marginBalanceInfoOpen, setMarginBalanceInfoOpen] = useState(false)
 
   useEffect(() => {
     if (!user.isLoggedIn && !autoOpened.current) {
@@ -200,6 +202,9 @@ export function AssetsPage() {
           pnlPercent={pnl.percent}
           actions={isOverview ? overviewActions : accountActions}
           onHistoryClick={showHistoryIcon ? handleHistoryClick : undefined}
+          onLabelClick={
+            activeTab === 'contract' ? () => setMarginBalanceInfoOpen(true) : undefined
+          }
         />
 
         {user.kycStatus !== 'verified' && (
@@ -272,6 +277,11 @@ export function AssetsPage() {
         onSelectFundHistory={openFundHistory}
         onSelectSpotHistory={openOrderHistory}
         onSelectContractHistory={openContractHistory}
+      />
+
+      <ContractMarginBalanceInfoSheet
+        open={marginBalanceInfoOpen}
+        onClose={() => setMarginBalanceInfoOpen(false)}
       />
     </AppLayout>
   )

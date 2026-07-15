@@ -75,6 +75,13 @@ export const contractPortfolioSummary: ContractPortfolioSummary = {
   marginRatioPercent: 0.98,
 }
 
+export const contractMarginBalanceInfoCopy = {
+  title: '保证金余额',
+  description:
+    '保证金余额：用户在合约账户中拥有的总资产。账户净值 = 仓位冻结+订单冻结+未实现盈亏+账户余额+体验金。',
+  confirmLabel: '好的',
+} as const
+
 export const contractPositions: ContractPosition[] = [
   {
     id: 'pos-eth-long',

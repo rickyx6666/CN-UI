@@ -39,7 +39,7 @@ export function WithdrawVerifyPage() {
     window.setTimeout(() => {
       setLoading(false)
       navigateWallet({
-        screen: 'withdraw-success',
+        screen: 'withdraw-security-verify',
         coin: withdrawDraft.coin,
         chain: withdrawDraft.chain,
       })

@@ -21,6 +21,7 @@ import {
 } from '../../data/wallet'
 import { usePrototype } from '../../context/PrototypeContext'
 import type { PcWalletModalScreen } from './pcOverlayScreens'
+import { WithdrawSecurityVerifyForm } from '../wallet/WithdrawSecurityVerifyForm'
 
 interface PcWalletModalProps {
   screen: PcWalletModalScreen
@@ -61,6 +62,10 @@ export function PcWalletModal({ screen, onClose, onNavigate }: PcWalletModalProp
 
   if (screen === 'withdraw-verify') {
     return <PcWithdrawVerifyModal onClose={onClose} onNavigate={onNavigate} />
+  }
+
+  if (screen === 'withdraw-security-verify') {
+    return <PcWithdrawSecurityVerifyModal onClose={onClose} onNavigate={onNavigate} />
   }
 
   return (
@@ -327,6 +332,51 @@ function PcWithdrawPanel({
   )
 }
 
+function PcWithdrawSecurityVerifyModal({
+  onClose,
+  onNavigate,
+}: {
+  onClose: () => void
+  onNavigate: (screen: WalletScreenState) => void
+}) {
+  const { withdrawDraft, navigateAccount } = usePrototype()
+
+  function handleBack() {
+    if (!withdrawDraft) {
+      onClose()
+      return
+    }
+    onNavigate({
+      screen: 'withdraw-verify',
+      coin: withdrawDraft.coin,
+      chain: withdrawDraft.chain,
+    })
+  }
+
+  return (
+    <PcModalShell
+      title={walletCopy.withdrawVerifyTitle}
+      onClose={handleBack}
+      maxWidth="max-w-md"
+    >
+      <WithdrawSecurityVerifyForm
+        onSuccess={() => {
+          if (!withdrawDraft) return
+          onNavigate({
+            screen: 'withdraw-success',
+            coin: withdrawDraft.coin,
+            chain: withdrawDraft.chain,
+          })
+        }}
+        onRequireGoogleSetup={() => {
+          onClose()
+          navigateAccount({ screen: 'security-google-setup' })
+        }}
+      />
+    </PcModalShell>
+  )
+}
+
 function PcWithdrawVerifyPanel({
   onNavigate,
 }: {
@@ -355,7 +405,7 @@ function PcWithdrawVerifyPanel({
     window.setTimeout(() => {
       setLoading(false)
       onNavigate({
-        screen: 'withdraw-success',
+        screen: 'withdraw-security-verify',
         coin: withdrawDraft.coin,
         chain: withdrawDraft.chain,
       })

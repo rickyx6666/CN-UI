@@ -2,6 +2,10 @@ import type { ReactNode } from 'react'
 import { usePrototype } from '../context/PrototypeContext'
 import { antiPhishingDemoScenes } from '../data/antiPhishing'
 import type { BottomTabId, KycStatus } from '../data/mock'
+import {
+  securityVerifyScenarioLabels,
+  type SecurityVerifyScenario,
+} from '../data/securityVerify'
 import { getKycLabel } from '../data/mock'
 import { previewPlatforms } from '../data/platform'
 import { useInspect } from '../context/InspectContext'
@@ -31,6 +35,10 @@ export function DevPanel() {
     openVersionUpdate,
     openAntiPhishingDemo,
     openKline,
+    securityVerifyScenario,
+    setSecurityVerifyScenario,
+    navigateWallet,
+    setWithdrawDraft,
   } = usePrototype()
   const { inspectMode, toggleInspectMode } = useInspect()
 
@@ -100,6 +108,111 @@ export function DevPanel() {
               {getKycLabel(status)}
             </ToggleBtn>
           ))}
+        </div>
+      </div>
+
+      <div className="mb-3">
+        <p className="mb-1.5 text-caption text-secondary">支付密码</p>
+        <div className="grid grid-cols-2 gap-1">
+          <ToggleBtn
+            active={isLoggedIn && !user.paymentPasswordSet}
+            onClick={() => {
+              if (!isLoggedIn) setLoggedIn(true)
+              updateProfile({ paymentPasswordSet: false })
+            }}
+          >
+            未设置
+          </ToggleBtn>
+          <ToggleBtn
+            active={isLoggedIn && user.paymentPasswordSet}
+            onClick={() => {
+              if (!isLoggedIn) setLoggedIn(true)
+              updateProfile({ paymentPasswordSet: true })
+            }}
+          >
+            已设置
+          </ToggleBtn>
+        </div>
+      </div>
+
+      <div className="mb-3">
+        <p className="mb-1.5 text-caption text-secondary">Google 验证</p>
+        <div className="grid grid-cols-2 gap-1">
+          <ToggleBtn
+            active={isLoggedIn && !user.googleAuthBound}
+            onClick={() => {
+              if (!isLoggedIn) setLoggedIn(true)
+              updateProfile({ googleAuthBound: false })
+            }}
+          >
+            未绑定
+          </ToggleBtn>
+          <ToggleBtn
+            active={isLoggedIn && user.googleAuthBound}
+            onClick={() => {
+              if (!isLoggedIn) setLoggedIn(true)
+              updateProfile({ googleAuthBound: true })
+            }}
+          >
+            已绑定
+          </ToggleBtn>
+        </div>
+      </div>
+
+      <div className="mb-3">
+        <p className="mb-1.5 text-caption text-secondary">手机验证</p>
+        <div className="grid grid-cols-2 gap-1">
+          <ToggleBtn
+            active={isLoggedIn && !user.phoneBound}
+            onClick={() => {
+              if (!isLoggedIn) setLoggedIn(true)
+              updateProfile({ phoneBound: false })
+            }}
+          >
+            未绑定
+          </ToggleBtn>
+          <ToggleBtn
+            active={isLoggedIn && user.phoneBound}
+            onClick={() => {
+              if (!isLoggedIn) setLoggedIn(true)
+              updateProfile({ phoneBound: true, phone: '13800138000' })
+            }}
+          >
+            已绑定
+          </ToggleBtn>
+        </div>
+      </div>
+
+      <div className="mb-3">
+        <p className="mb-1.5 text-caption text-secondary">安全验证场景</p>
+        <div className="grid grid-cols-2 gap-1">
+          {(Object.keys(securityVerifyScenarioLabels) as SecurityVerifyScenario[]).map(
+            (scenario) => (
+              <ToggleBtn
+                key={scenario}
+                active={securityVerifyScenario === scenario}
+                onClick={() => {
+                  if (!isLoggedIn) setLoggedIn(true)
+                  setSecurityVerifyScenario(scenario)
+                  setWithdrawDraft({
+                    coin: 'USDT',
+                    chain: 'TRC20',
+                    address: 'TXk3yP9n8vL2mR4qW6sH1jF5cD7bA9eG0x',
+                    amount: 100,
+                    fee: 1,
+                    receive: 99,
+                  })
+                  navigateWallet({
+                    screen: 'withdraw-security-verify',
+                    coin: 'USDT',
+                    chain: 'TRC20',
+                  })
+                }}
+              >
+                {securityVerifyScenarioLabels[scenario]}
+              </ToggleBtn>
+            ),
+          )}
         </div>
       </div>
 

@@ -9,6 +9,7 @@ import type { RecordsScreenState } from '../data/records'
 import type { SettingsSheet } from '../data/settings'
 import type { SupportScreenState } from '../data/support'
 import type { PendingOrder, SpotOrder, TradeSheet } from '../data/trade'
+import type { SecurityVerifyScenario } from '../data/securityVerify'
 import type { WalletScreenState, WithdrawDraft } from '../data/wallet'
 
 export type FigmaToastVariant = 'success' | 'error' | 'warning' | 'info'
@@ -47,6 +48,10 @@ export interface PrototypePreset {
   userPaymentPasswordSet?: boolean
   /** Figma 导出：覆盖是否已绑定 Google 验证器 */
   userGoogleAuthBound?: boolean
+  /** Figma 导出：覆盖是否已绑定手机 */
+  userPhoneBound?: boolean
+  /** Figma 导出：安全验证场景 */
+  securityVerifyScenario?: SecurityVerifyScenario
   /** Figma 导出：资产中心叠加层 */
   accountOverlay?: 'security' | 'logout' | 'delete'
   /** Figma 导出：钱包页叠加层 */

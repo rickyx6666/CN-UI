@@ -8,6 +8,7 @@ export type WalletScreenName =
   | 'deposit-save-success'
   | 'withdraw'
   | 'withdraw-verify'
+  | 'withdraw-security-verify'
   | 'withdraw-success'
   | 'transfer'
 
@@ -136,6 +137,7 @@ export const walletCopy = {
   depositSaveSuccessTitle: '保存成功',
   withdrawTitle: '提币',
   withdrawVerifyTitle: '安全验证',
+  withdrawGoogleVerifyTitle: '身份验证器 App 验证',
   withdrawSuccessTitle: '提币申请已提交',
   transferTitle: '划转',
 } as const

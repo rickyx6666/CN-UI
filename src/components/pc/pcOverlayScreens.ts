@@ -7,6 +7,7 @@ export type PcWalletModalScreen =
   | 'deposit-address'
   | 'withdraw'
   | 'withdraw-verify'
+  | 'withdraw-security-verify'
   | 'withdraw-success'
 
 export type PcRecordsModalScreen = 'fund' | 'fund-detail' | 'deposit-detail'
@@ -17,6 +18,7 @@ const pcWalletModalScreens = new Set<WalletScreenState['screen']>([
   'deposit-address',
   'withdraw',
   'withdraw-verify',
+  'withdraw-security-verify',
   'withdraw-success',
 ])
 

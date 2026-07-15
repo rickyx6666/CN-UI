@@ -1,13 +1,10 @@
-import { useEffect, useState } from 'react'
-import { AuthButton } from '../../components/auth/AuthButton'
-import { AddVerificationMethodSheet } from '../../components/account/AddVerificationMethodSheet'
-import { OtpField } from '../../components/auth/OtpField'
 import { SubPageLayout } from '../../components/account/SubPageLayout'
+import { MultiFactorSecurityVerifyForm } from '../../components/security/MultiFactorSecurityVerifyForm'
 import {
   accountCopy,
   getSecurityVerifyMeta,
 } from '../../data/account'
-import { isValidOtp } from '../../data/auth'
+import { getSecurityVerifyConfig } from '../../data/securityVerify'
 import { usePrototype } from '../../context/PrototypeContext'
 
 export function AccountSecurityVerifyPage() {
@@ -23,17 +20,6 @@ export function AccountSecurityVerifyPage() {
   } = usePrototype()
   const purpose = accountScreen?.securityVerifyPurpose
 
-  const [otp, setOtp] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>()
-  const [showVerificationSheet, setShowVerificationSheet] = useState(false)
-
-  useEffect(() => {
-    if (!user.googleAuthBound) {
-      setShowVerificationSheet(true)
-    }
-  }, [user.googleAuthBound])
-
   if (!purpose) return null
 
   const meta = getSecurityVerifyMeta(purpose, user)
@@ -42,19 +28,7 @@ export function AccountSecurityVerifyPage() {
     navigateAccount(meta.backScreen())
   }
 
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-
-    if (!user.googleAuthBound) {
-      setShowVerificationSheet(true)
-      return
-    }
-
-    if (!isValidOtp(otp)) {
-      setError('请输入 6 位 Google 验证码')
-      return
-    }
-
+  function handleSuccess() {
     if (purpose === 'payment-password' && !paymentPasswordDraft) {
       navigateAccount({ screen: 'security-payment-password' })
       return
@@ -65,54 +39,31 @@ export function AccountSecurityVerifyPage() {
       return
     }
 
-    setError(undefined)
-    setLoading(true)
-    window.setTimeout(() => {
-      if (purpose === 'payment-password') {
-        updateProfile({ paymentPasswordSet: true })
-        setPaymentPasswordDraft(null)
-        navigateAccount({ screen: 'security' })
-      } else {
-        updateProfile({ antiPhishingCode: antiPhishingDraft })
-        setAntiPhishingDraft(null)
-        navigateAccount({ screen: 'security-anti-phishing' })
-      }
-      setLoading(false)
-    }, 400)
-  }
+    if (purpose === 'payment-password') {
+      updateProfile({ paymentPasswordSet: true })
+      setPaymentPasswordDraft(null)
+      navigateAccount({ screen: 'security' })
+      return
+    }
 
-  function handleEnableVerification() {
-    setShowVerificationSheet(false)
-    navigateAccount({ screen: 'security-google-setup' })
+    updateProfile({ antiPhishingCode: antiPhishingDraft })
+    setAntiPhishingDraft(null)
+    navigateAccount({ screen: 'security-anti-phishing' })
   }
 
   return (
-    <>
-      <SubPageLayout title={accountCopy.securityVerifyTitle} onBack={handleBack}>
-        <p className="mb-6 text-body-sm text-secondary">{meta.hint}</p>
-
-        <form onSubmit={handleSubmit}>
-          <OtpField
-            label="Google 验证码"
-            value={otp}
-            onChange={setOtp}
-            error={error}
-          />
-          <AuthButton type="submit" loading={loading}>
-            {meta.submitLabel}
-          </AuthButton>
-        </form>
-      </SubPageLayout>
-
-      <AddVerificationMethodSheet
-        open={showVerificationSheet}
-        onClose={() => {
-          setShowVerificationSheet(false)
-          if (!user.googleAuthBound) handleBack()
+    <SubPageLayout title={accountCopy.securityVerifyTitle} onBack={handleBack}>
+      <MultiFactorSecurityVerifyForm
+        config={{
+          ...getSecurityVerifyConfig('google-email'),
+          hint: meta.hint,
+          submitLabel: meta.submitLabel,
         }}
-        onEnable={handleEnableVerification}
-        defaultMethod="authenticator"
+        onSuccess={handleSuccess}
+        onRequireGoogleSetup={() =>
+          navigateAccount({ screen: 'security-google-setup' })
+        }
       />
-    </>
+    </SubPageLayout>
   )
 }

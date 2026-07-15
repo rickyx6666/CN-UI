@@ -16,6 +16,7 @@ interface AccountBalanceSummaryProps {
   pnlPercent?: number
   actions: AccountBalanceAction[]
   onHistoryClick?: () => void
+  onLabelClick?: () => void
 }
 
 export function AccountBalanceSummary({
@@ -25,6 +26,7 @@ export function AccountBalanceSummary({
   pnlPercent = 0,
   actions,
   onHistoryClick,
+  onLabelClick,
 }: AccountBalanceSummaryProps) {
   const [visible, setVisible] = useState(true)
   const isPositive = pnlUsd >= 0
@@ -33,7 +35,17 @@ export function AccountBalanceSummary({
     <section className="pb-4">
       <div className="mb-2 flex items-center justify-between">
         <div className="flex items-center gap-1.5">
-          <span className="text-body-sm text-secondary">{label}</span>
+          {onLabelClick ? (
+            <button
+              type="button"
+              onClick={onLabelClick}
+              className="border-b border-dashed border-secondary text-body-sm text-secondary active:opacity-70"
+            >
+              {label}
+            </button>
+          ) : (
+            <span className="text-body-sm text-secondary">{label}</span>
+          )}
           <button
             type="button"
             aria-label={visible ? '隐藏余额' : '显示余额'}

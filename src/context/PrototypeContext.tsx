@@ -46,6 +46,10 @@ import type { ChartScreenState } from '../data/kline'
 import type { PreviewPlatform } from '../data/platform'
 import { loadAppTheme, saveAppTheme, type AppTheme } from '../data/appTheme'
 import type { PrototypePreset, FigmaToastPreset } from '../figma/types'
+import {
+  defaultSecurityVerifyScenario,
+  type SecurityVerifyScenario,
+} from '../data/securityVerify'
 import type { AppToastState, ToastVariant } from '../data/feedback'
 import type { ProductModule } from '../data/productModule'
 import { isContractPairId } from '../data/productModule'
@@ -158,6 +162,8 @@ interface PrototypeContextValue {
   toast: AppToastState | null
   showToast: (message: string, variant?: ToastVariant) => void
   dismissToast: () => void
+  securityVerifyScenario: SecurityVerifyScenario
+  setSecurityVerifyScenario: (scenario: SecurityVerifyScenario) => void
 }
 
 const PrototypeContext = createContext<PrototypeContextValue | null>(null)
@@ -169,6 +175,8 @@ const loggedInProfileDefaults: Omit<UserProfile, 'isLoggedIn'> = {
   bio: '',
   kycStatus: 'pending' satisfies KycStatus,
   googleAuthBound: true,
+  phone: '13800138000',
+  phoneBound: true,
   paymentPasswordSet: false,
   antiPhishingCode: null,
 }
@@ -181,6 +189,8 @@ const guestProfile: UserProfile = {
   bio: '',
   kycStatus: 'unverified',
   googleAuthBound: false,
+  phone: '',
+  phoneBound: false,
   paymentPasswordSet: false,
   antiPhishingCode: null,
 }
@@ -206,6 +216,9 @@ export function PrototypeProvider({
     ...(preset?.userKycStatus ? { kycStatus: preset.userKycStatus } : {}),
     ...(preset?.userGoogleAuthBound !== undefined
       ? { googleAuthBound: preset.userGoogleAuthBound }
+      : {}),
+    ...(preset?.userPhoneBound !== undefined
+      ? { phoneBound: preset.userPhoneBound }
       : {}),
     ...(preset?.userPaymentPasswordSet !== undefined
       ? { paymentPasswordSet: preset.userPaymentPasswordSet }
@@ -256,6 +269,10 @@ export function PrototypeProvider({
   const [withdrawDraft, setWithdrawDraft] = useState<WithdrawDraft | null>(
     preset?.withdrawDraft ?? null,
   )
+  const [securityVerifyScenario, setSecurityVerifyScenario] =
+    useState<SecurityVerifyScenario>(
+      preset?.securityVerifyScenario ?? defaultSecurityVerifyScenario,
+    )
   const [antiPhishingDraft, setAntiPhishingDraft] = useState<string | null>(
     preset?.antiPhishingDraft ?? null,
   )
@@ -816,6 +833,8 @@ export function PrototypeProvider({
       toast,
       showToast,
       dismissToast,
+      securityVerifyScenario,
+      setSecurityVerifyScenario,
     }),
     [
       isLoggedIn,
@@ -912,6 +931,7 @@ export function PrototypeProvider({
       toast,
       showToast,
       dismissToast,
+      securityVerifyScenario,
     ],
   )
 
