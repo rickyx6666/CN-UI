@@ -24,7 +24,7 @@ export function SecurityGoogleVerifyPage() {
 
     setLoading(true)
     window.setTimeout(() => {
-      updateProfile({ googleAuthBound: true })
+      updateProfile({ googleAuthBound: true, googleAuthBoundAt: new Date().toISOString().slice(0, 10) })
       setLoading(false)
       if (antiPhishingDraft) {
         navigateAccount(securityVerifyScreen('anti-phishing'))

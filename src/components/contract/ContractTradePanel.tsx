@@ -297,14 +297,16 @@ export function ContractTradePanel({
           <RefreshCw className="h-3 w-3" strokeWidth={1.5} />
         </span>
         <span className="flex items-center gap-1 tabular-nums text-primary">
-          {formatTradeAmount(available, 'USDT')} USDT
-          <button
-            type="button"
-            aria-label="划转"
-            className="flex h-4 w-4 items-center justify-center rounded-full bg-brand text-brand-dark"
-          >
-            <Plus className="h-2.5 w-2.5" strokeWidth={2.5} />
-          </button>
+          {isLoggedIn ? `${formatTradeAmount(available, 'USDT')} USDT` : '-- USDT'}
+          {isLoggedIn ? (
+            <button
+              type="button"
+              aria-label="划转"
+              className="flex h-4 w-4 items-center justify-center rounded-full bg-brand text-brand-dark"
+            >
+              <Plus className="h-2.5 w-2.5" strokeWidth={2.5} />
+            </button>
+          ) : null}
         </span>
       </div>
 
@@ -391,6 +393,7 @@ export function ContractTradePanel({
           closable={closableLong}
           margin={marginPerSide}
           base={pair.base}
+          isLoggedIn={isLoggedIn}
           onClick={() => handleTrade('long')}
         />
         <TradeActionBlock
@@ -400,6 +403,7 @@ export function ContractTradePanel({
           closable={closableShort}
           margin={marginPerSide}
           base={pair.base}
+          isLoggedIn={isLoggedIn}
           onClick={() => handleTrade('short')}
         />
       </div>
@@ -414,6 +418,7 @@ function TradeActionBlock({
   closable,
   margin,
   base,
+  isLoggedIn,
   onClick,
 }: {
   side: 'long' | 'short'
@@ -422,6 +427,7 @@ function TradeActionBlock({
   closable: number
   margin: number
   base: string
+  isLoggedIn: boolean
   onClick: () => void
 }) {
   const isLong = side === 'long'
@@ -437,6 +443,7 @@ function TradeActionBlock({
     : isLong
       ? 'bg-success text-white'
       : 'bg-danger text-white'
+  const showLogin = !isLoggedIn
 
   return (
     <div>
@@ -469,11 +476,13 @@ function TradeActionBlock({
         type="button"
         onClick={onClick}
         className={`flex w-full items-center rounded-md px-3 py-2.5 active:opacity-90 ${buttonTone} ${
-          isClose ? 'justify-center' : 'justify-between'
+          isClose || showLogin ? 'justify-center' : 'justify-between'
         }`}
       >
-        <span className="text-caption font-semibold">{actionLabel}</span>
-        {!isClose ? (
+        <span className="text-caption font-semibold">
+          {showLogin ? '登录' : actionLabel}
+        </span>
+        {!isClose && isLoggedIn ? (
           <span className="text-[10px] opacity-90">{biasLabel}</span>
         ) : null}
       </button>

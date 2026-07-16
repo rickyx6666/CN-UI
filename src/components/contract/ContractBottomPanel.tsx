@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronUp, CircleHelp, FileText } from 'lucide-react'
+import { ChevronUp, CircleHelp, ClipboardList, FileText } from 'lucide-react'
 import type { MarketPair } from '../../data/mock'
 import {
   contractOpenOrders,
@@ -175,14 +175,13 @@ export function ContractBottomPanel({
 
       <div className="min-h-[72px] px-3">
         {!isLoggedIn ? (
-          <p className="py-8 text-center text-caption text-secondary">
-            登录后可查看
-          </p>
+          <ContractPanelEmptyState
+            message={tab === 'positions' ? '暂无仓位' : '暂无委托'}
+            icon={tab === 'positions' ? 'positions' : 'orders'}
+          />
         ) : tab === 'positions' ? (
           visiblePositions.length === 0 ? (
-            <p className="py-8 text-center text-caption text-secondary">
-              暂无持仓
-            </p>
+            <ContractPanelEmptyState message="暂无仓位" icon="positions" />
           ) : (
             <div>
               {visiblePositions.map((position) => (
@@ -191,9 +190,7 @@ export function ContractBottomPanel({
             </div>
           )
         ) : visibleOrders.length === 0 ? (
-          <p className="py-8 text-center text-caption text-secondary">
-            暂无委托
-          </p>
+          <ContractPanelEmptyState message="暂无委托" icon="orders" />
         ) : (
           <div>
             {visibleOrders.map((order) =>
@@ -300,5 +297,24 @@ function SubTabChip({
     >
       {label}
     </button>
+  )
+}
+
+function ContractPanelEmptyState({
+  message,
+  icon,
+}: {
+  message: string
+  icon: 'positions' | 'orders'
+}) {
+  const Icon = icon === 'positions' ? ClipboardList : FileText
+
+  return (
+    <div className="flex flex-col items-center py-10 text-secondary">
+      <div className="relative flex h-16 w-16 items-center justify-center">
+        <Icon className="h-10 w-10 opacity-35" strokeWidth={1.25} />
+      </div>
+      <p className="mt-1 text-caption">{message}</p>
+    </div>
   )
 }

@@ -45,6 +45,7 @@ import type { BottomTabId, KycStatus, UserProfile } from '../data/mock'
 import type { ChartScreenState } from '../data/kline'
 import type { PreviewPlatform } from '../data/platform'
 import { loadAppTheme, saveAppTheme, type AppTheme } from '../data/appTheme'
+import { defaultGoogleAuthBoundAt } from '../data/googleAuth'
 import type { PrototypePreset, FigmaToastPreset } from '../figma/types'
 import {
   defaultSecurityVerifyScenario,
@@ -175,6 +176,7 @@ const loggedInProfileDefaults: Omit<UserProfile, 'isLoggedIn'> = {
   bio: '',
   kycStatus: 'pending' satisfies KycStatus,
   googleAuthBound: true,
+  googleAuthBoundAt: defaultGoogleAuthBoundAt,
   phone: '13800138000',
   phoneBound: true,
   paymentPasswordSet: false,
@@ -189,6 +191,7 @@ const guestProfile: UserProfile = {
   bio: '',
   kycStatus: 'unverified',
   googleAuthBound: false,
+  googleAuthBoundAt: null,
   phone: '',
   phoneBound: false,
   paymentPasswordSet: false,

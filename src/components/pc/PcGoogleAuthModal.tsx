@@ -5,7 +5,8 @@ import { accountCopy, securityVerifyScreen } from '../../data/account'
 import { isValidOtp } from '../../data/auth'
 import { usePrototype } from '../../context/PrototypeContext'
 import { AuthButton } from '../auth/AuthButton'
-import { OtpField } from '../auth/OtpField'
+import { GoogleAuthenticatorBoundPanel } from '../account/GoogleAuthenticatorBoundPanel'
+import { googleAuthCopy } from '../../data/googleAuth'
 import { TextField } from '../auth/TextField'
 import { FigmaQrPlaceholder } from '../figma/FigmaQrPlaceholder'
 import { PcModalShell } from './PcModalShell'
@@ -43,7 +44,10 @@ export function PcGoogleAuthModal({ screen, onClose, onNavigate }: PcGoogleAuthM
       <PcVerifyModal
         onClose={() => onNavigate({ screen: 'security-google-setup' })}
         onSuccess={() => {
-          updateProfile({ googleAuthBound: true })
+          updateProfile({
+            googleAuthBound: true,
+            googleAuthBoundAt: new Date().toISOString().slice(0, 10),
+          })
           if (antiPhishingDraft) {
             onNavigate(securityVerifyScreen('anti-phishing'))
             return
@@ -59,7 +63,12 @@ export function PcGoogleAuthModal({ screen, onClose, onNavigate }: PcGoogleAuthM
   }
 
   if (user.googleAuthBound) {
-    return <PcUnbindModal onClose={onClose} />
+    return (
+      <PcGoogleAuthBoundModal
+        onClose={onClose}
+        onNavigate={onNavigate}
+      />
+    )
   }
 
   return (
@@ -88,38 +97,25 @@ export function PcGoogleAuthModal({ screen, onClose, onNavigate }: PcGoogleAuthM
   )
 }
 
-function PcUnbindModal({ onClose }: { onClose: () => void }) {
-  const { updateProfile } = usePrototype()
-  const [otp, setOtp] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string>()
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-    if (!isValidOtp(otp)) {
-      setError('请输入 6 位 Google 验证码')
-      return
-    }
-    setError(undefined)
-    setLoading(true)
-    window.setTimeout(() => {
-      updateProfile({ googleAuthBound: false })
-      setLoading(false)
-      onClose()
-    }, 400)
-  }
+function PcGoogleAuthBoundModal({
+  onClose,
+  onNavigate,
+}: {
+  onClose: () => void
+  onNavigate: (screen: AccountScreenState) => void
+}) {
+  const { user } = usePrototype()
 
   return (
-    <PcModalShell title="Google 验证器" onClose={onClose} maxWidth="max-w-md">
-      <p className="mb-4 text-body-sm text-secondary">
-        已绑定 Google 验证器。解绑后，提币等敏感操作将不再需要 Google 验证码。
-      </p>
-      <form onSubmit={handleSubmit}>
-        <OtpField label="Google 验证码" value={otp} onChange={setOtp} error={error} />
-        <AuthButton type="submit" loading={loading}>
-          确认解绑
-        </AuthButton>
-      </form>
+    <PcModalShell
+      title={googleAuthCopy.boundPageTitle}
+      onClose={onClose}
+      maxWidth="max-w-lg"
+    >
+      <GoogleAuthenticatorBoundPanel
+        boundAt={user.googleAuthBoundAt}
+        onRemove={() => onNavigate(securityVerifyScreen('google-unbind'))}
+      />
     </PcModalShell>
   )
 }

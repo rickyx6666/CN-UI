@@ -36,6 +36,7 @@ verification-code-general.preview.html
 | `{{sent_at}}` | 2026/07/10 21:14 (UTC+8) | 发送时间 |
 | `{{support_email}}` | support@coinnova.app | 客服邮箱 |
 | `{{year}}` | 2026 | 版权年份 |
+| `{{anti_phishing_code}}` | 12NovaA | 用户防钓鱼码；**为空时不渲染页脚区块** |
 
 ## 各模板专属变量
 
@@ -80,6 +81,15 @@ verification-code-general.preview.html
 | 验证码标签 | Login Code | Register Code | Security Code |
 | 特色区块 | — | — | 操作内容说明 |
 | 安全提示 | 灰色常规 | 灰色常规 | 红色强调 |
+| 防钓鱼码 | 页脚展示 | 页脚展示 | 页脚展示 |
+
+## 防钓鱼码页脚
+
+当 `anti_phishing_code` **有值**时，在版权区上方插入 `_partials/anti-phishing-block.html`；**为空则整段不输出**。
+
+- **左侧**：核对提示文案
+- **右侧**：黄色「防钓鱼码」标签 + 白底黑框码值
+- **预览页**：`*.preview.html` 固定展示已设置示例（12NovaA），便于设计验收
 
 ## 上线检查
 

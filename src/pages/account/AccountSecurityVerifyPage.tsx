@@ -3,9 +3,18 @@ import { MultiFactorSecurityVerifyForm } from '../../components/security/MultiFa
 import {
   accountCopy,
   getSecurityVerifyMeta,
+  type SecurityVerifyPurpose,
 } from '../../data/account'
-import { getSecurityVerifyConfig } from '../../data/securityVerify'
+import {
+  getSecurityVerifyConfig,
+  type SecurityVerifyScenario,
+} from '../../data/securityVerify'
 import { usePrototype } from '../../context/PrototypeContext'
+
+function getSecurityVerifyScenario(purpose: SecurityVerifyPurpose): SecurityVerifyScenario {
+  if (purpose === 'google-unbind') return 'google-contact'
+  return 'google-email'
+}
 
 export function AccountSecurityVerifyPage() {
   const {
@@ -23,12 +32,19 @@ export function AccountSecurityVerifyPage() {
   if (!purpose) return null
 
   const meta = getSecurityVerifyMeta(purpose, user)
+  const scenario = getSecurityVerifyScenario(purpose)
 
   function handleBack() {
     navigateAccount(meta.backScreen())
   }
 
   function handleSuccess() {
+    if (purpose === 'google-unbind') {
+      updateProfile({ googleAuthBound: false, googleAuthBoundAt: null })
+      navigateAccount({ screen: 'security-google' })
+      return
+    }
+
     if (purpose === 'payment-password' && !paymentPasswordDraft) {
       navigateAccount({ screen: 'security-payment-password' })
       return
@@ -55,7 +71,7 @@ export function AccountSecurityVerifyPage() {
     <SubPageLayout title={accountCopy.securityVerifyTitle} onBack={handleBack}>
       <MultiFactorSecurityVerifyForm
         config={{
-          ...getSecurityVerifyConfig('google-email'),
+          ...getSecurityVerifyConfig(scenario),
           hint: meta.hint,
           submitLabel: meta.submitLabel,
         }}

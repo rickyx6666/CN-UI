@@ -1,0 +1,30 @@
+<!--
+  防钓鱼码页脚区块 — 仅当 anti_phishing_code 有值时由服务端插入，为空则不渲染本块。
+
+  变量：{{anti_phishing_code}}  如 12NovaA
+-->
+<tr>
+  <td class="content-pad" style="padding:0 32px 24px;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-top:1px solid #F0F0F2;padding-top:20px;">
+      <tr>
+        <td valign="middle" class="anti-phishing-text" style="padding-right:16px;">
+          <p style="margin:0;font-size:12px;line-height:18px;color:#71717A;">
+            请核对邮件下方显示的防钓鱼码是否与您的设置一致。如不一致，请勿操作。
+          </p>
+        </td>
+        <td align="right" valign="middle" class="anti-phishing-badge" style="white-space:nowrap;">
+          <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="display:inline-table;">
+            <tr>
+              <td style="padding:7px 10px;background-color:#FFCC00;font-size:12px;line-height:16px;font-weight:600;color:#0A0A0A;border:1px solid #FFCC00;border-radius:4px 0 0 4px;">
+                防钓鱼码
+              </td>
+              <td style="padding:7px 14px;background-color:#FFFFFF;border:1px solid #0A0A0A;border-left:none;font-family:'IBM Plex Mono',ui-monospace,Consolas,monospace;font-size:14px;line-height:16px;font-weight:600;color:#0A0A0A;border-radius:0 4px 4px 0;letter-spacing:0.04em;">
+                {{anti_phishing_code}}
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </td>
+</tr>

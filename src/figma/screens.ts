@@ -89,6 +89,18 @@ const tabScreens: MobileScreenDef[] = [
     preset: app({ isLoggedIn: true, activeTab: 'trade' }),
   },
   {
+    path: 'trade/contract-guest',
+    label: '交易 · 合约 · 未登录',
+    description: '开多/开空按钮显示「登录」',
+    group: 'tab',
+    preset: app({
+      isLoggedIn: false,
+      activeTab: 'trade',
+      productModule: 'contract',
+      selectedPairId: 'perp-btc',
+    }),
+  },
+  {
     path: 'trade/contract',
     label: '交易 · 合约',
     description: '开多 / 开空 · 杠杆与盘口',
@@ -288,7 +300,8 @@ const accountScreens: MobileScreenDef[] = [
   },
   {
     path: 'account/security-google',
-    label: 'Google 验证器',
+    label: 'Google 验证器 · 已绑定',
+    description: '身份验证器App验证 · 添加时间与安全提示',
     group: 'account',
     preset: app({
       isLoggedIn: true,
@@ -436,6 +449,22 @@ const accountScreens: MobileScreenDef[] = [
         antiPhishingMode: 'change',
       },
       userAntiPhishingCode: '12NovaA',
+    }),
+  },
+  {
+    path: 'account/security-verify-google-unbind',
+    label: '安全验证 · 解除 Google 验证器',
+    description: 'Google + 邮箱/手机 · 解除绑定',
+    group: 'account',
+    preset: app({
+      isLoggedIn: true,
+      activeTab: 'market',
+      userGoogleAuthBound: true,
+      userPhoneBound: true,
+      accountScreen: {
+        screen: 'security-verify',
+        securityVerifyPurpose: 'google-unbind',
+      },
     }),
   },
   {
@@ -1104,6 +1133,18 @@ const pcScreens: FigmaScreenEntry[] = [
       activeTab: 'assets',
       userKycStatus: 'verified',
       accountOverlay: 'security',
+    }),
+  },
+  {
+    path: 'pc/account/security-google',
+    label: 'PC · Google 验证器 · 已绑定弹窗',
+    group: 'pc',
+    preset: pc({
+      isLoggedIn: true,
+      activeTab: 'assets',
+      userKycStatus: 'verified',
+      userGoogleAuthBound: true,
+      accountScreen: { screen: 'security-google' },
     }),
   },
   {

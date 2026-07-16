@@ -10,6 +10,7 @@
     场景：新用户注册邮箱验证
     变量：{{verification_code}} {{recipient_email}} {{valid_minutes}} {{sent_at}}
           {{support_email}} {{year}}
+          {{anti_phishing_code}}  非空时插入 _partials/anti-phishing-block.html
     主题行：【CoinNova】您的注册验证码：{{verification_code}}
   -->
   <style type="text/css">
@@ -21,6 +22,8 @@
       .wrapper { width: 100% !important; }
       .content-pad { padding-left: 20px !important; padding-right: 20px !important; }
       .code-digit { font-size: 28px !important; letter-spacing: 6px !important; }
+      .anti-phishing-text { display: block !important; width: 100% !important; padding-right: 0 !important; padding-bottom: 12px !important; }
+      .anti-phishing-badge { display: block !important; width: 100% !important; text-align: left !important; }
     }
   </style>
 </head>
@@ -98,6 +101,8 @@
               </table>
             </td>
           </tr>
+
+          <!-- anti_phishing：仅当 {{anti_phishing_code}} 非空时，服务端插入 _partials/anti-phishing-block.html -->
 
           <tr>
             <td class="content-pad" style="padding:20px 32px 28px;border-top:1px solid #F0F0F2;">

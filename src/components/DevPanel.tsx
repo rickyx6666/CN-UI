@@ -6,6 +6,7 @@ import {
   securityVerifyScenarioLabels,
   type SecurityVerifyScenario,
 } from '../data/securityVerify'
+import { defaultGoogleAuthBoundAt } from '../data/googleAuth'
 import { getKycLabel } from '../data/mock'
 import { previewPlatforms } from '../data/platform'
 import { useInspect } from '../context/InspectContext'
@@ -142,7 +143,7 @@ export function DevPanel() {
             active={isLoggedIn && !user.googleAuthBound}
             onClick={() => {
               if (!isLoggedIn) setLoggedIn(true)
-              updateProfile({ googleAuthBound: false })
+              updateProfile({ googleAuthBound: false, googleAuthBoundAt: null })
             }}
           >
             未绑定
@@ -151,7 +152,10 @@ export function DevPanel() {
             active={isLoggedIn && user.googleAuthBound}
             onClick={() => {
               if (!isLoggedIn) setLoggedIn(true)
-              updateProfile({ googleAuthBound: true })
+              updateProfile({
+                googleAuthBound: true,
+                googleAuthBoundAt: defaultGoogleAuthBoundAt,
+              })
             }}
           >
             已绑定

@@ -1,7 +1,7 @@
 import { antiPhishingCopy } from './antiPhishing'
 import type { UserProfile } from './mock'
 
-export type SecurityVerifyPurpose = 'payment-password' | 'anti-phishing'
+export type SecurityVerifyPurpose = 'payment-password' | 'anti-phishing' | 'google-unbind'
 
 export type AccountScreenName =
   | 'hub'
@@ -73,6 +73,14 @@ export function getSecurityVerifyMeta(
       hint: `请完成身份验证器与邮箱验证，以${action}支付密码。`,
       submitLabel: user.paymentPasswordSet ? '确认修改' : '确认设置',
       backScreen: () => ({ screen: 'security-payment-password' as const }),
+    }
+  }
+
+  if (purpose === 'google-unbind') {
+    return {
+      hint: '请完成身份验证器验证，并通过邮箱或手机完成二次验证，以解除身份验证器绑定。',
+      submitLabel: '确认解除',
+      backScreen: () => ({ screen: 'security-google' as const }),
     }
   }
 
