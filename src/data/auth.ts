@@ -68,9 +68,9 @@ export const authCopy = {
   resetPasswordTitle: '重置密码',
   forgotPasswordTitle: '忘记密码',
   securityTitle: '安全验证',
-  forgotPasswordHint: '请输入注册时使用的邮箱或手机号，我们将引导您完成安全验证并重置密码。',
-  resetPasswordHint: (account: string) => `为 ${account} 设置新登录密码`,
   resetPasswordSuccess: '密码已重置，请使用新密码登录',
+  resetPasswordWithdrawTip:
+    '为确保您的账户安全，在您更改密码后24小时内禁止提现',
   emailSent: (email: string) => `验证码已发送至 ${email}`,
   email2faHint: '账户密码已验证，请完成邮箱二次验证',
   email2faSent: (email: string) => `二次验证码已发送至 ${email}`,

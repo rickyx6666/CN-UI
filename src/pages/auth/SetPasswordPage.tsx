@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AuthButton } from '../../components/auth/AuthButton'
 import { AuthPageShell } from '../../components/auth/AuthPageShell'
+import { AuthSecurityTipBanner } from '../../components/auth/AuthSecurityTipBanner'
 import { TextField } from '../../components/auth/TextField'
 import { authCopy, isValidPassword } from '../../data/auth'
 import { usePrototype } from '../../context/PrototypeContext'
@@ -72,13 +73,11 @@ export function SetPasswordPage({
 
   return (
     <AuthPageShell title={title} onBack={handleBack}>
-      <p className="mb-6 text-body-sm text-secondary">
-        {mode === 'reset'
-          ? authCopy.resetPasswordHint(email)
-          : <>为 <span className="text-primary">{email}</span> 设置登录密码</>}
-      </p>
-      {inviteCode && (
-        <p className="-mt-3 mb-6 text-caption text-brand">邀请码：{inviteCode}</p>
+      {mode === 'reset' && (
+        <AuthSecurityTipBanner
+          message={authCopy.resetPasswordWithdrawTip}
+          className="mb-4"
+        />
       )}
 
       <form onSubmit={handleSubmit}>
@@ -105,6 +104,15 @@ export function SetPasswordPage({
           {mode === 'reset' ? '确认重置' : '完成注册'}
         </AuthButton>
       </form>
+
+      {mode === 'register' && inviteCode && (
+        <p className="mt-4 text-center text-caption text-brand">邀请码：{inviteCode}</p>
+      )}
+      {mode === 'register' && !inviteCode && (
+        <p className="mt-4 text-center text-caption text-primary-muted">
+          为 <span className="text-secondary">{email}</span> 设置登录密码
+        </p>
+      )}
     </AuthPageShell>
   )
 }

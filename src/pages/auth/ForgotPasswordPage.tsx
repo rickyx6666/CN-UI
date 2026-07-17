@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { AuthButton } from '../../components/auth/AuthButton'
 import { AuthPageShell } from '../../components/auth/AuthPageShell'
+import { AuthSecurityTipBanner } from '../../components/auth/AuthSecurityTipBanner'
 import { TextField } from '../../components/auth/TextField'
 import { authCopy, isValidAccount } from '../../data/auth'
 import { usePrototype } from '../../context/PrototypeContext'
@@ -36,8 +37,22 @@ export function ForgotPasswordPage() {
     <AuthPageShell
       title={authCopy.forgotPasswordTitle}
       onBack={() => setAuthScreen({ screen: returnScreen })}
+      footer={
+        <p className="text-center text-body-sm text-secondary">
+          <button
+            type="button"
+            onClick={() => setAuthScreen({ screen: returnScreen })}
+            className="font-medium text-brand active:opacity-70"
+          >
+            返回登录
+          </button>
+        </p>
+      }
     >
-      <p className="mb-6 text-body-sm text-secondary">{authCopy.forgotPasswordHint}</p>
+      <AuthSecurityTipBanner
+        message={authCopy.resetPasswordWithdrawTip}
+        className="mb-4"
+      />
 
       <form onSubmit={handleSubmit}>
         <TextField
@@ -54,17 +69,6 @@ export function ForgotPasswordPage() {
           下一步
         </AuthButton>
       </form>
-
-      <p className="mt-6 text-center text-body-sm text-secondary">
-        想起密码了？{' '}
-        <button
-          type="button"
-          onClick={() => setAuthScreen({ screen: returnScreen })}
-          className="font-medium text-brand active:opacity-70"
-        >
-          返回登录
-        </button>
-      </p>
     </AuthPageShell>
   )
 }
