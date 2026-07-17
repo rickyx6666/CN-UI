@@ -8,10 +8,17 @@ import { usePrototype } from '../../context/PrototypeContext'
 interface SetPasswordPageProps {
   email: string
   inviteCode?: string
+  mode?: 'register' | 'reset'
+  returnScreen?: 'entry' | 'login'
 }
 
-export function SetPasswordPage({ email, inviteCode }: SetPasswordPageProps) {
-  const { setAuthScreen } = usePrototype()
+export function SetPasswordPage({
+  email,
+  inviteCode,
+  mode = 'register',
+  returnScreen = 'login',
+}: SetPasswordPageProps) {
+  const { setAuthScreen, showToast } = usePrototype()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
@@ -34,6 +41,11 @@ export function SetPasswordPage({ email, inviteCode }: SetPasswordPageProps) {
     setLoading(true)
     window.setTimeout(() => {
       setLoading(false)
+      if (mode === 'reset') {
+        showToast(authCopy.resetPasswordSuccess)
+        setAuthScreen({ screen: returnScreen })
+        return
+      }
       setAuthScreen({
         screen: 'security-verify',
         email,
@@ -43,13 +55,27 @@ export function SetPasswordPage({ email, inviteCode }: SetPasswordPageProps) {
     }, 400)
   }
 
+  const title = mode === 'reset' ? authCopy.resetPasswordTitle : authCopy.passwordTitle
+
+  function handleBack() {
+    if (mode === 'reset') {
+      setAuthScreen({
+        screen: 'forgot-security-verify',
+        email,
+        flow: 'reset',
+        returnScreen,
+      })
+      return
+    }
+    setAuthScreen({ screen: 'register-verify', email, inviteCode })
+  }
+
   return (
-    <AuthPageShell
-      title={authCopy.passwordTitle}
-      onBack={() => setAuthScreen({ screen: 'register-verify', email, inviteCode })}
-    >
+    <AuthPageShell title={title} onBack={handleBack}>
       <p className="mb-6 text-body-sm text-secondary">
-        为 <span className="text-primary">{email}</span> 设置登录密码
+        {mode === 'reset'
+          ? authCopy.resetPasswordHint(email)
+          : <>为 <span className="text-primary">{email}</span> 设置登录密码</>}
       </p>
       {inviteCode && (
         <p className="-mt-3 mb-6 text-caption text-brand">邀请码：{inviteCode}</p>
@@ -76,7 +102,7 @@ export function SetPasswordPage({ email, inviteCode }: SetPasswordPageProps) {
         />
 
         <AuthButton type="submit" loading={loading}>
-          完成注册
+          {mode === 'reset' ? '确认重置' : '完成注册'}
         </AuthButton>
       </form>
     </AuthPageShell>

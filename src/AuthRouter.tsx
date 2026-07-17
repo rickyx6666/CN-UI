@@ -1,5 +1,7 @@
 import { usePrototype } from './context/PrototypeContext'
 import { AuthEntryPage } from './pages/auth/AuthEntryPage'
+import { ForgotPasswordPage } from './pages/auth/ForgotPasswordPage'
+import { ForgotPasswordSecurityVerifyPage } from './pages/auth/ForgotPasswordSecurityVerifyPage'
 import { LoginPage } from './pages/auth/LoginPage'
 import { RegisterPage } from './pages/auth/RegisterPage'
 import { SecurityVerifyPage } from './pages/auth/SecurityVerifyPage'
@@ -46,11 +48,28 @@ export function AuthRouter() {
           inviteCode={authScreen.inviteCode}
         />
       )
+    case 'forgot-password':
+      return <ForgotPasswordPage />
+    case 'forgot-security-verify':
+      return (
+        <ForgotPasswordSecurityVerifyPage
+          account={authScreen.email ?? ''}
+          returnScreen={authScreen.returnScreen}
+        />
+      )
+    case 'reset-password':
+      return (
+        <SetPasswordPage
+          email={authScreen.email ?? ''}
+          mode="reset"
+          returnScreen={authScreen.returnScreen}
+        />
+      )
     case 'security-verify':
       return (
         <SecurityVerifyPage
           email={authScreen.email ?? ''}
-          flow={authScreen.flow ?? 'login'}
+          flow={authScreen.flow === 'register' ? 'register' : 'login'}
         />
       )
     default:

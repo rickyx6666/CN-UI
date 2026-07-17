@@ -1,3 +1,5 @@
+import type { UserProfile } from './mock'
+
 export type AuthScreenName =
   | 'entry'
   | 'login'
@@ -6,6 +8,9 @@ export type AuthScreenName =
   | 'register-verify'
   | 'register-password'
   | 'security-verify'
+  | 'forgot-password'
+  | 'forgot-security-verify'
+  | 'reset-password'
   | 'tg-connect'
   | 'tg-link'
   | 'tg-success'
@@ -14,9 +19,11 @@ export interface AuthScreenState {
   screen: AuthScreenName
   email?: string
   inviteCode?: string
-  flow?: 'login' | 'register'
+  flow?: 'login' | 'register' | 'reset'
   /** 登录验证码页来源：密码登录后的邮箱二次验证 / 验证码登录主验证 */
   loginMethod?: 'password' | 'code'
+  /** 找回密码完成后返回的登录页 */
+  returnScreen?: 'entry' | 'login'
 }
 
 export type LoginMode = 'password' | 'code'
@@ -58,9 +65,36 @@ export const authCopy = {
   verifyTitle: '输入验证码',
   email2faTitle: '邮箱二次验证',
   passwordTitle: '设置密码',
+  resetPasswordTitle: '重置密码',
+  forgotPasswordTitle: '忘记密码',
   securityTitle: '安全验证',
+  forgotPasswordHint: '请输入注册时使用的邮箱或手机号，我们将引导您完成安全验证并重置密码。',
+  resetPasswordHint: (account: string) => `为 ${account} 设置新登录密码`,
+  resetPasswordSuccess: '密码已重置，请使用新密码登录',
   emailSent: (email: string) => `验证码已发送至 ${email}`,
   email2faHint: '账户密码已验证，请完成邮箱二次验证',
   email2faSent: (email: string) => `二次验证码已发送至 ${email}`,
   termsLabel: '我已阅读并同意《服务协议》和《隐私政策》',
 } as const
+
+/** 找回密码流程中模拟已绑定安全项的账户资料（原型用） */
+export function getForgotPasswordUserProfile(account: string): UserProfile {
+  const trimmed = account.trim()
+  const email = isValidEmail(trimmed) ? trimmed : 'user@coinnova.com'
+  const phone = isValidPhone(trimmed) ? trimmed : '13800138000'
+
+  return {
+    isLoggedIn: false,
+    uid: 'demo',
+    nickname: '',
+    email,
+    bio: '',
+    kycStatus: 'verified',
+    googleAuthBound: true,
+    googleAuthBoundAt: '2024-06-01',
+    phone,
+    phoneBound: true,
+    paymentPasswordSet: true,
+    antiPhishingCode: null,
+  }
+}

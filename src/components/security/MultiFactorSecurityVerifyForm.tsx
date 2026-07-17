@@ -4,6 +4,7 @@ import { VerifyCodeField } from '../auth/VerifyCodeField'
 import { AddVerificationMethodSheet } from '../account/AddVerificationMethodSheet'
 import { SwitchVerifyMethodSheet } from './SwitchVerifyMethodSheet'
 import { isValidOtp } from '../../data/auth'
+import type { UserProfile } from '../../data/mock'
 import {
   getDefaultActiveMethod,
   getMethodHelperText,
@@ -19,6 +20,8 @@ interface MultiFactorSecurityVerifyFormProps {
   config: SecurityVerifySceneConfig
   onSuccess: () => void
   onRequireGoogleSetup: () => void
+  /** 未登录场景（如找回密码）传入模拟账户资料 */
+  userOverride?: UserProfile
 }
 
 type VerifyValues = Partial<Record<SecurityVerifyMethodId, string>>
@@ -29,8 +32,10 @@ export function MultiFactorSecurityVerifyForm({
   config,
   onSuccess,
   onRequireGoogleSetup,
+  userOverride,
 }: MultiFactorSecurityVerifyFormProps) {
-  const { user } = usePrototype()
+  const { user: contextUser } = usePrototype()
+  const user = userOverride ?? contextUser
   const [values, setValues] = useState<VerifyValues>({})
   const [errors, setErrors] = useState<VerifyErrors>({})
   const [loading, setLoading] = useState(false)

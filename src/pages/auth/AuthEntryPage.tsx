@@ -134,15 +134,26 @@ export function AuthEntryPage() {
         />
 
         {tab === 'login' && loginMode === 'password' && (
-          <TextField
-            label="密码"
-            type="password"
-            value={password}
-            onChange={setPassword}
-            placeholder="请输入密码"
-            error={errors.password}
-            autoComplete="current-password"
-          />
+          <>
+            <TextField
+              label="密码"
+              type="password"
+              value={password}
+              onChange={setPassword}
+              placeholder="请输入密码"
+              error={errors.password}
+              autoComplete="current-password"
+            />
+            <div className="mb-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setAuthScreen({ screen: 'forgot-password', returnScreen: 'entry' })}
+                className="text-body-sm text-brand active:opacity-70"
+              >
+                忘记密码？
+              </button>
+            </div>
+          </>
         )}
 
         {tab === 'login' && loginMode === 'password' && (

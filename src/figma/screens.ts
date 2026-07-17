@@ -235,6 +235,44 @@ const authScreens: MobileScreenDef[] = [
     }),
   },
   {
+    path: 'auth/forgot-password',
+    label: '忘记密码',
+    group: 'auth',
+    preset: app({
+      isLoggedIn: false,
+      activeTab: 'market',
+      authScreen: { screen: 'forgot-password' },
+    }),
+  },
+  {
+    path: 'auth/forgot-security-verify',
+    label: '忘记密码 · 安全验证',
+    group: 'auth',
+    preset: app({
+      isLoggedIn: false,
+      activeTab: 'market',
+      authScreen: {
+        screen: 'forgot-security-verify',
+        email: demoEmail,
+        flow: 'reset',
+      },
+    }),
+  },
+  {
+    path: 'auth/reset-password',
+    label: '忘记密码 · 重置密码',
+    group: 'auth',
+    preset: app({
+      isLoggedIn: false,
+      activeTab: 'market',
+      authScreen: {
+        screen: 'reset-password',
+        email: demoEmail,
+        flow: 'reset',
+      },
+    }),
+  },
+  {
     path: 'auth/tg-connect',
     label: 'Telegram · 授权',
     group: 'auth',
@@ -1270,6 +1308,28 @@ const pcScreens: FigmaScreenEntry[] = [
       isLoggedIn: false,
       activeTab: 'home',
       authScreen: { screen: 'register', inviteCode: demoInviteCode },
+    }),
+  },
+  {
+    path: 'pc/auth/forgot-password',
+    label: 'PC · 忘记密码',
+    description: '左右分栏',
+    group: 'pc',
+    preset: pc({
+      isLoggedIn: false,
+      activeTab: 'home',
+      authScreen: { screen: 'forgot-password' },
+    }),
+  },
+  {
+    path: 'pc/auth/reset-password',
+    label: 'PC · 重置密码',
+    description: '安全验证后设置新密码',
+    group: 'pc',
+    preset: pc({
+      isLoggedIn: false,
+      activeTab: 'home',
+      authScreen: { screen: 'reset-password', email: demoEmail, flow: 'reset' },
     }),
   },
   {

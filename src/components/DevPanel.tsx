@@ -32,6 +32,7 @@ export function DevPanel() {
     openLogin,
     openRegister,
     openAccount,
+    setAuthScreen,
     openComplianceRestriction,
     openVersionUpdate,
     openAntiPhishingDemo,
@@ -228,6 +229,12 @@ export function DevPanel() {
           </ToggleBtn>
           <ToggleBtn active={false} onClick={openRegister}>
             注册页
+          </ToggleBtn>
+          <ToggleBtn
+            active={false}
+            onClick={() => setAuthScreen({ screen: 'forgot-password' })}
+          >
+            忘记密码
           </ToggleBtn>
           <ToggleBtn active={false} onClick={openAccount}>
             账户设置
