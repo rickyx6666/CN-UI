@@ -3,6 +3,7 @@ import { AuthButton } from '../auth/AuthButton'
 import { VerifyCodeField } from '../auth/VerifyCodeField'
 import { AddVerificationMethodSheet } from '../account/AddVerificationMethodSheet'
 import { SwitchVerifyMethodSheet } from './SwitchVerifyMethodSheet'
+import { SecurityVerifyUnavailableSheet } from './SecurityVerifyUnavailableSheet'
 import { isValidOtp } from '../../data/auth'
 import type { UserProfile } from '../../data/mock'
 import {
@@ -34,13 +35,14 @@ export function MultiFactorSecurityVerifyForm({
   onRequireGoogleSetup,
   userOverride,
 }: MultiFactorSecurityVerifyFormProps) {
-  const { user: contextUser } = usePrototype()
+  const { user: contextUser, openSupportCenter } = usePrototype()
   const user = userOverride ?? contextUser
   const [values, setValues] = useState<VerifyValues>({})
   const [errors, setErrors] = useState<VerifyErrors>({})
   const [loading, setLoading] = useState(false)
   const [showVerificationSheet, setShowVerificationSheet] = useState(false)
   const [showSwitchSheet, setShowSwitchSheet] = useState(false)
+  const [showUnavailableSheet, setShowUnavailableSheet] = useState(false)
   const [codeSent, setCodeSent] = useState<CodeSentState>({})
   const [activeMethod, setActiveMethod] = useState<SecurityVerifyMethodId>(() =>
     getDefaultActiveMethod(user, ['google', 'email', 'phone']),
@@ -66,6 +68,10 @@ export function MultiFactorSecurityVerifyForm({
         return ['google', contactMethod] as SecurityVerifyMethodId[]
       case 'contact':
         return [activeMethod]
+      case 'email-phone':
+        return ['email', 'phone'] as SecurityVerifyMethodId[]
+      case 'google-email-phone':
+        return ['google', 'email', 'phone'] as SecurityVerifyMethodId[]
     }
   }, [scenario, activeMethod, contactMethod])
 
@@ -210,6 +216,7 @@ export function MultiFactorSecurityVerifyForm({
         ) : null}
         <button
           type="button"
+          onClick={() => setShowUnavailableSheet(true)}
           className="block text-body-sm text-brand active:opacity-70"
         >
           安全验证不可用？
@@ -231,6 +238,12 @@ export function MultiFactorSecurityVerifyForm({
           onRequireGoogleSetup()
         }}
         defaultMethod="authenticator"
+      />
+
+      <SecurityVerifyUnavailableSheet
+        open={showUnavailableSheet}
+        onClose={() => setShowUnavailableSheet(false)}
+        onContactSupport={openSupportCenter}
       />
     </>
   )
